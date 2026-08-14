@@ -2,6 +2,8 @@
 
 # DeepSeek Harness 用量与消耗插件（dsh-usage）
 
+[English](./README.en.md) | **简体中文**
+
 [GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/deepseekharnessdesktop) · MIT License
 
 **DeepSeek Harness 官方系列插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、余额查询、日历热力图与 CSV / JSON / PNG 导出。
