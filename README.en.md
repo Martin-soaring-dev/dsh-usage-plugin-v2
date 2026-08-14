@@ -6,7 +6,7 @@
 
 [GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/deepseekharnessdesktop) · MIT License
 
-**Official plugin series for DeepSeek Harness** — records token usage and cost for every model call, with peak/off-peak billing, balance query, a calendar heatmap, and CSV / JSON / PNG export.
+**A community plugin for DeepSeek Harness** — records token usage and cost for every model call, with peak/off-peak billing, balance query, a calendar heatmap, and CSV / JSON / PNG export.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -65,7 +65,7 @@ The package integrates with DSH through two declarations:
 
 | Declaration | Purpose |
 | --- | --- |
-| `dsh.bundle.patch` (`cordis.patch.yml`) | Lets DSH recognize it as an **official plugin package**: `dsh plugin --profile <name> add <package>` installs and wires it in one command, no manual config editing |
+| `dsh.bundle.patch` (`cordis.patch.yml`) | Lets DSH recognize it as a **standard bundle plugin package**: `dsh plugin --profile <name> add <package>` installs and wires it in one command, no manual config editing |
 | `dsh.client` + `exports["./client"]` | Lets the web client auto-load the browser panel at `/plugins/<package>/client.js` |
 
 So for users, **installation is one command** — no YAML editing, no manual file copying.

@@ -6,7 +6,7 @@
 
 [GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/deepseekharnessdesktop) · MIT License
 
-**DeepSeek Harness 官方系列插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、余额查询、日历热力图与 CSV / JSON / PNG 导出。
+**由开发者制作的 DeepSeek Harness 插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、余额查询、日历热力图与 CSV / JSON / PNG 导出。
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -65,7 +65,7 @@ dsh plugin --profile headless add @feiyang666/deepseekharnessdesktop
 
 | 声明 | 作用 |
 | --- | --- |
-| `dsh.bundle.patch`（`cordis.patch.yml`） | 让 DSH 把它识别为**官方插件包**：`dsh plugin --profile <名> add <包名>` 一条命令即可安装并自动接线，无需手改任何配置文件 |
+| `dsh.bundle.patch`（`cordis.patch.yml`） | 让 DSH 把它识别为**标准 bundle 插件包**：`dsh plugin --profile <名> add <包名>` 一条命令即可安装并自动接线，无需手改任何配置文件 |
 | `dsh.client` + `exports["./client"]` | 让 web 客户端在 `/plugins/<包名>/client.js` 自动加载浏览器面板 |
 
 所以对使用者来说，**安装就是一条命令**，不用碰 YAML、不用手动复制文件。
