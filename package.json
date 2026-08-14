@@ -1,0 +1,62 @@
+{
+  "name": "@feiyang666/deepseekharnessdesktop",
+  "version": "1.3.0",
+  "description": "DeepSeek Harness usage & cost tracker plugin: per-call token/cache-hit stats, peak/off-peak billing, DeepSeek balance query, CSV/JSON/PNG export with custom destination, and persistent local storage. Ships a host half plus a web client half in one npm package; installs into a DSH profile as a dsh.bundle with one command (dsh plugin --profile web add @feiyang666/deepseekharnessdesktop).",
+  "keywords": [
+    "deepseek",
+    "harness",
+    "dsh",
+    "plugin",
+    "usage",
+    "cost",
+    "tokens",
+    "cache",
+    "balance"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feiyang-dev/dsh-usage-plugin.git"
+  },
+  "homepage": "https://github.com/feiyang-dev/dsh-usage-plugin#readme",
+  "bugs": {
+    "url": "https://github.com/feiyang-dev/dsh-usage-plugin/issues"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "files": [
+    "lib",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md"
+  ],
+  "scripts": {
+    "wire": "node scripts/wire.js",
+    "check": "node scripts/check-package.js",
+    "prepublishOnly": "node scripts/check-package.js",
+    "pack": "npm pack"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  }
+}
