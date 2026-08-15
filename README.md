@@ -33,6 +33,14 @@ dsh-usage 是 DeepSeek Harness 生态的**用量与消耗统计插件**（DSH pl
 
 ---
 
+## 界面预览
+
+### 用量与消耗
+![用量与消耗](./docs/assets/usage-overview.png)
+
+### 剩余余额查询
+![剩余余额查询](./docs/assets/balance-query.png)
+
 ## 推荐安装方式
 
 > 两个方法任选其一，效果等价。**推荐使用桌面端**，全程图形化、无需命令行。

@@ -33,6 +33,14 @@ dsh-usage is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem
 
 ---
 
+## Screenshots
+
+### Usage & Consumption
+![Usage & Consumption](./docs/assets/usage-overview.png)
+
+### Balance Query
+![Balance Query](./docs/assets/balance-query.png)
+
 ## Recommended Installation
 
 > Either method works and is equivalent. **We recommend the desktop app** — fully graphical, no command line needed.
