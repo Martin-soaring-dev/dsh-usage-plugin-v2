@@ -46,10 +46,10 @@ Install [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harne
 dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
 ```
 
-Or specify a version / install to another profile:
+Or install to another profile:
 
 ```bash
-dsh plugin --profile web add @feiyang666/deepseekharnessdesktop@1.1.0
+dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
 dsh plugin --profile headless add @feiyang666/deepseekharnessdesktop
 ```
 
@@ -94,8 +94,6 @@ This does three things (all automatic):
 
 Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> Specify a version: `dsh plugin --profile web add @feiyang666/deepseekharnessdesktop@1.1.0`
->
 > Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-deepseekharnessdesktop-1.1.0.tgz`
 
 ### 2. Method B: manual install (no pnpm / no `dsh plugin`)

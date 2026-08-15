@@ -46,10 +46,10 @@ dsh-usage 是 DeepSeek Harness 生态的**用量与消耗统计插件**（DSH pl
 dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
 ```
 
-也可指定版本、或对其它 profile 安装：
+也可对其它 profile 安装：
 
 ```bash
-dsh plugin --profile web add @feiyang666/deepseekharnessdesktop@1.1.0
+dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
 dsh plugin --profile headless add @feiyang666/deepseekharnessdesktop
 ```
 
@@ -94,8 +94,6 @@ dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
 
 其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
 
-> 想指定版本：`dsh plugin --profile web add @feiyang666/deepseekharnessdesktop@1.1.0`
->
 > 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-deepseekharnessdesktop-1.1.0.tgz`
 
 ### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
