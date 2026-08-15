@@ -20,6 +20,12 @@
     "type": "git",
     "url": "git+https://github.com/feiyang-dev/dsh-usage-plugin.git"
   },
+  "contributors": [
+    {
+      "name": "liu3734",
+      "url": "https://github.com/liu3734"
+    }
+  ],
   "homepage": "https://github.com/feiyang-dev/dsh-usage-plugin#readme",
   "bugs": {
     "url": "https://github.com/feiyang-dev/dsh-usage-plugin/issues"

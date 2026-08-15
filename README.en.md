@@ -244,6 +244,10 @@ pnpm run build
 pnpm dsh web
 ```
 
+## Acknowledgements
+
+- **[@liu3734](https://github.com/liu3734)**: reported and diagnosed the Windows-only path handling / spawn issues on macOS (POSIX) and proposed the cross-platform fix ([#1](https://github.com/feiyang-dev/dsh-usage-plugin/issues/1)).
+
 ## License
 
 MIT © dsh-usage-plugin

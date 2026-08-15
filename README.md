@@ -244,6 +244,10 @@ pnpm run build
 pnpm dsh web
 ```
 
+## 致谢
+
+- **[@liu3734](https://github.com/liu3734)**：报告并定位 macOS（POSIX）下路径处理与 spawn 的 Windows 专用问题，提出跨平台修复方案（[#1](https://github.com/feiyang-dev/dsh-usage-plugin/issues/1)）。
+
 ## 许可
 
 MIT © dsh-usage-plugin
