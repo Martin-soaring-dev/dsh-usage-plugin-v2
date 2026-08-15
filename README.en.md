@@ -20,6 +20,8 @@
 
 dsh-usage is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem (a DSH plugin shipped as a Host + Client two-in-one package). After installation, **"Usage & Cost"** and **"Balance Query"** tabs appear in the Web UI, right after "Conversation" and "Trace":
 
+> Supports **Windows / macOS / Linux**: paths are handled per platform (`node:path`), and the folder picker / "reveal in file manager" use each OS's native mechanism (macOS: `osascript` / `open`; Linux: `zenity` / `xdg-open`). Balance query and export do not depend on Windows-only commands.
+
 - **Usage & Cost**: records each model call's token usage and cache hits (input miss / cache hit / cache write / output / reasoning / finish reason), and computes cost using DeepSeek's peak/valley or base pricing (peak hours are automatically priced by Beijing time 09:00–12:00 and 14:00–18:00).
 - **Usage Calendar**: a monthly daily-usage heatmap (colored by cost or call count), hover for details, click a day for its call list, plus a per-day statistics table and monthly summary.
 - **Cache Hit List**: newest-first, fully scrollable, with quick filters (Today / 7 days / 30 days / All) and custom date ranges.
