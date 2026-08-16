@@ -22,14 +22,15 @@ dsh-usage is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem
 
 > Supports **Windows / macOS / Linux**: paths are handled per platform (`node:path`), and the folder picker / "reveal in file manager" use each OS's native mechanism (macOS: `osascript` / `open`; Linux: `zenity` / `xdg-open`). Balance query and export do not depend on Windows-only commands.
 
-- **Usage & Cost**: records each model call's token usage and cache hits (input miss / cache hit / cache write / output / reasoning / finish reason), and computes cost using DeepSeek's peak/valley or base pricing (peak hours are automatically priced by Beijing time 09:00–12:00 and 14:00–18:00).
-- **Usage Calendar**: a monthly daily-usage heatmap (colored by cost or call count), hover for details, click a day for its call list, plus a per-day statistics table and monthly summary.
-- **Cache Hit List**: newest-first, fully scrollable, with quick filters (Today / 7 days / 30 days / All) and custom date ranges.
-- **Price Table**: shows base and peak/valley unit prices, editable and persisted in the panel (`pricing.json`), with a restore-default option.
+- **Usage & Cost**: records each model call's token usage and cache hits (input miss / cache hit / cache write / output / reasoning / finish reason), and computes cost using DeepSeek's peak/valley or base pricing (peak hours are automatically priced by Beijing time 09:00–12:00 and 14:00–18:00). Model names come from the actual request parameters, so non-DeepSeek models are shown truthfully instead of "unknown model"; models without an official price are counted as 0. The overview shows a by-model table plus a by-API-provider × model drill-down (each provider grouped with every model's calls and peak/off-peak cost split) and a grand total row.
+- **Usage Calendar**: a monthly daily-usage heatmap (colored by cost or call count), hover for details including the peak/off-peak cost split, click a day for its call list and peak/off-peak totals, plus a per-day statistics table with peak cost / off-peak cost / total columns and monthly rollups.
+- **Cache Hit List**: newest-first, fully scrollable, with quick filters (Today / 7 days / 30 days / All) and custom date ranges; the summary line and footer total split peak vs off-peak consumption with a grand cost total. The list is paginated (100 rows per page), so it stays smooth even with large data volumes.
+- **Price Table**: the official DeepSeek API price table — base and peak/valley unit prices shown side by side (peak vs off-peak), editable in-panel and persisted to `pricing.json`, with a reset-to-default option.
 - **Balance Query**: queries your DeepSeek account balance using the configured `DEEPSEEK_API_KEY`.
-- **Export**: CSV / JSON / **PNG long image** (newest-first, up to the latest 2000 records, warns if exceeded), to any directory (native picker), auto-opens the folder after export.
+- **Export**: CSV / JSON / **PNG long image** (newest-first, up to the latest 2000 records, warns if exceeded; the PNG report includes peak/off-peak cost columns), to any directory (native picker), auto-opens the folder after export.
 - **Import**: merge-imports JSON / CSV files, deduplicated by time.
 - **Persistence**: records are written live to `<session workspace>/dsh-usage/usage-records.json` and restored on restart (cap 100000 records).
+- **UI adaptation**: panel typography scales with the app's display-size setting (em-relative fonts); table wrapping and spacing are tuned so large display sizes stay readable.
 
 ---
 
