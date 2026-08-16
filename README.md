@@ -1,12 +1,12 @@
 <div align="center">
 
-# DeepSeek Harness 用量与消耗插件（dsh-usage）
+# DeepSeek Harness Usage & Cost Tracker (dsh-usage-plugin)
 
-[English](./README.en.md) | **简体中文**
+**English** · [简体中文](./README.zh.md)
 
-[GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/deepseekharnessdesktop) · MIT License
+[GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
 
-**由开发者制作的 DeepSeek Harness 插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、余额查询、日历热力图与 CSV / JSON / PNG 导出。
+**A community plugin for DeepSeek Harness** — records token usage and cost for every model call, with peak/off-peak billing, balance query, a calendar heatmap, and CSV / JSON / PNG export.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -16,124 +16,134 @@
 
 ---
 
-## 简介
-
-dsh-usage 是 DeepSeek Harness 生态的**用量与消耗统计插件**（DSH plugin，Host + Client 双面一体包）。装好后在 WebUI 顶部「对话」「轨迹」之后会出现 **「用量与消耗」** 与 **「剩余余额查询」** 两个 tab：
-
-> 支持 **Windows / macOS / Linux**：路径按当前平台处理（`node:path`），目录选择与「打开所在目录」均调用系统原生方式（macOS 用 `osascript` / `open`，Linux 用 `zenity` / `xdg-open`），余额查询与导出不依赖 Windows 专用命令。
-
-- **用量与消耗**：记录每次模型调用的 token 用量与缓存命中（输入·未命中 / 缓存命中 / 缓存写入 / 输出 / 推理 / 结束原因），按 DeepSeek 峰谷/基础价格计算消耗（高峰时段自动按北京时间 9:00–12:00、14:00–18:00 计价）。模型名以请求参数为准如实显示（非 DeepSeek 模型不再显示为「未知模型」，无官方价格的模型消耗按 0 统计）。概览含「按模型」表与「按 API 服务商 × 模型」明细表（每个服务商一组，组内列出各模型的调用与高峰/空闲分列消耗），底部有总费用合计。
-- **用量日历**：按月查看每日用量热力图（按消耗或调用数着色），悬停查看详情（含高峰 / 空闲消耗拆分）、点击某天查看当日调用明细与高峰/空闲消耗统计，附本月每日统计表（高峰消耗 / 空闲消耗 / 总消耗分列）与月度汇总。
-- **缓存命中列表**：最新记录排在最前，支持 今天 / 近7天 / 近30天 / 全部 快捷筛选与自定义起止日期区间，汇总行与表尾合计区分高峰消耗 / 空闲消耗 / 总费用合计；列表分页渲染（每页 100 条），记录量大也不卡顿。
-- **价格表**：**DeepSeek 官方 API 价格表**，展示基础价与峰谷价（高峰/空闲）单价表，高峰价与空闲价分列展示，支持在面板内直接编辑价格并持久化（数据目录 `pricing.json`），也可一键恢复默认。
-- **剩余余额查询**：用当前配置的 `DEEPSEEK_API_KEY` 查询 DeepSeek 账户余额。
-- **导出**：CSV / JSON / **PNG 长图**（按最新在前展示，最多含最近 2000 条，超出会提示；PNG 报告含高峰 / 空闲消耗分列统计），可导出到任意目录（原生目录选择器），导出后自动打开所在目录。
-- **导入**：选择文件（JSON / CSV）合并导入，按时间去重。
-- **持久化**：记录实时落盘到 `<会话工作区>/dsh-usage/usage-records.json`，重启自动恢复（上限 100000 条，尽量多存）。
-- **界面适配**：面板字号跟随应用「显示大小」设置自动缩放（em 相对字号），面板宽度以视口封顶、宽表格在容器内横向滑动（max-content + overflow-x），任何窗口大小下所有列与合计都完整可见，不会裁掉右侧内容。
+> ## 🔔 Important Notice (2026-08-16): npm package renamed
+>
+> The **npm package has been renamed from `@feiyang666/deepseekharnessdesktop` to `@feiyang666/dsh-usage-plugin`** (matching the GitHub repo `feiyang-dev/dsh-usage-plugin`).
+>
+> - Use the new package name for install / upgrade: `dsh plugin --profile web add @feiyang666/dsh-usage-plugin`
+> - The old package `@feiyang666/deepseekharnessdesktop` remains published for a while, but it is **no longer maintained and will not receive updates** — please migrate soon.
+> - The desktop client ([`DeepSeek Harness Desktop`](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)) supports both package names and will auto-detect old-name installs with a **one-click update** to the new name.
 
 ---
 
-## 界面预览
+## Overview
 
-### 用量与消耗
-![用量与消耗](./docs/assets/usage-overview.png)
+dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem (a DSH plugin shipped as a Host + Client two-in-one package). After installation, **"Usage & Cost"** and **"Balance Query"** tabs appear in the Web UI, right after "Conversation" and "Trace":
 
-### 剩余余额查询
-![剩余余额查询](./docs/assets/balance-query.png)
+> Supports **Windows / macOS / Linux**: paths are handled per platform (`node:path`), and the folder picker / "reveal in file manager" use each OS's native mechanism (macOS: `osascript` / `open`; Linux: `zenity` / `xdg-open`). Balance query and export do not depend on Windows-only commands.
 
-## 推荐安装方式
-
-> 两个方法任选其一，效果等价。**推荐使用桌面端**，全程图形化、无需命令行。
-
-### 方式一（推荐）：桌面端一键安装
-
-安装 [DeepSeek Harness 桌面版](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)，打开后点击 **「安装插件」→ 推荐插件 → 用量与消耗插件 → 一键安装**，完成后点 **「立即重启服务」** 即可生效。
-
-### 方式二：命令行安装
-
-```bash
-# 前提：已安装 dsh（npm install -g @deepseek-ai/dsh）
-dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
-```
-
-也可对其它 profile 安装：
-
-```bash
-dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
-dsh plugin --profile headless add @feiyang666/deepseekharnessdesktop
-```
-
-装完重启 dsh web 服务即可。详细的手动安装 / 接线 / 卸载 / 排障说明见下方。
+- **Usage & Cost**: records each model call's token usage and cache hits (input miss / cache hit / cache write / output / reasoning / finish reason), and computes cost using DeepSeek's peak/valley or base pricing (peak hours are automatically priced by Beijing time 09:00–12:00 and 14:00–18:00). Model names come from the actual request parameters, so non-DeepSeek models are shown truthfully instead of "unknown model"; models without an official price are counted as 0. The overview shows a by-model table plus a by-API-provider × model drill-down (each provider grouped with every model's calls and peak/off-peak cost split) and a grand total row.
+- **Usage Calendar**: a monthly daily-usage heatmap (colored by cost or call count), hover for details including the peak/off-peak cost split, click a day for its call list and peak/off-peak totals, plus a per-day statistics table with peak cost / off-peak cost / total columns and monthly rollups.
+- **Cache Hit List**: newest-first, fully scrollable, with quick filters (Today / 7 days / 30 days / All) and custom date ranges; the summary line and footer total split peak vs off-peak consumption with a grand cost total. The list is paginated (100 rows per page), so it stays smooth even with large data volumes.
+- **Price Table**: the official DeepSeek API price table — base and peak/valley unit prices shown side by side (peak vs off-peak), editable in-panel and persisted to `pricing.json`, with a reset-to-default option.
+- **Balance Query**: queries your DeepSeek account balance using the configured `DEEPSEEK_API_KEY`.
+- **Export**: CSV / JSON / **PNG long image** (newest-first, up to the latest 2000 records, warns if exceeded; the PNG report includes peak/off-peak cost columns), to any directory (native picker), auto-opens the folder after export.
+- **Import**: merge-imports JSON / CSV files, deduplicated by time.
+- **Persistence**: records are written live to `<session workspace>/dsh-usage/usage-records.json` and restored on restart (cap 100000 records).
+- **UI adaptation**: panel typography scales with the app's display-size setting (em-relative fonts); table wrapping and spacing are tuned so large display sizes stay readable.
 
 ---
 
-## 这个包是什么
+## Screenshots
 
-一个 npm 包 = **host 半**（Node 侧 Cordis 插件，负责记录、计费、余额查询、导出，见 `lib/index.js`）+ **client 半**（浏览器侧面板，见 `lib/client.js`，通过 `/usage/api` 与 host 通信）。
+### Usage & Consumption
+![Usage & Consumption](./docs/assets/usage-overview.png)
 
-包通过两处声明接入 DSH：
+### Balance Query
+![Balance Query](./docs/assets/balance-query.png)
 
-| 声明 | 作用 |
+## Recommended Installation
+
+> Either method works and is equivalent. **We recommend the desktop app** — fully graphical, no command line needed.
+
+### Option 1 (recommended): One-click via the desktop app
+
+Install [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop), open it, then go to **"Install Plugins" → Recommended → Usage & Cost Tracker → Install** and click **"Restart Service Now"** to activate.
+
+### Option 2: Command line
+
+```bash
+# Prerequisite: install dsh (npm install -g @deepseek-ai/dsh)
+dsh plugin --profile web add @feiyang666/dsh-usage-plugin
+```
+
+Or install to another profile:
+
+```bash
+dsh plugin --profile web add @feiyang666/dsh-usage-plugin
+dsh plugin --profile headless add @feiyang666/dsh-usage-plugin
+```
+
+Restart the dsh web service after installation. Detailed manual install / wiring / uninstall / troubleshooting follows below.
+
+---
+
+## What's in the package
+
+One npm package = a **host half** (Node-side Cordis plugin: recording, billing, balance query, export — see `lib/index.js`) + a **client half** (browser-side panel — see `lib/client.js`, which talks to the host via `/usage/api`).
+
+The package integrates with DSH through two declarations:
+
+| Declaration | Purpose |
 | --- | --- |
-| `dsh.bundle.patch`（`cordis.patch.yml`） | 让 DSH 把它识别为**标准 bundle 插件包**：`dsh plugin --profile <名> add <包名>` 一条命令即可安装并自动接线，无需手改任何配置文件 |
-| `dsh.client` + `exports["./client"]` | 让 web 客户端在 `/plugins/<包名>/client.js` 自动加载浏览器面板 |
+| `dsh.bundle.patch` (`cordis.patch.yml`) | Lets DSH recognize it as a **standard bundle plugin package**: `dsh plugin --profile <name> add <package>` installs and wires it in one command, no manual config editing |
+| `dsh.client` + `exports["./client"]` | Lets the web client auto-load the browser panel at `/plugins/<package>/client.js` |
 
-所以对使用者来说，**安装就是一条命令**，不用碰 YAML、不用手动复制文件。
+So for users, **installation is one command** — no YAML editing, no manual file copying.
 
 ---
 
-## 安装（给使用者）
+## Installation (for users)
 
-### 0. 前提条件
+### 0. Prerequisites
 
-- 已安装 DeepSeek Harness（`npm install -g @deepseek-ai/dsh` 全局安装，或使用基于它的桌面应用 / `npx @deepseek-ai/dsh web`）。
-- 安装方式 A（推荐）需要 **pnpm**：`npm install -g pnpm`（或 `corepack enable`）。
-- 确保 `dsh` 命令在 PATH 里（桌面应用自带环境则在其终端中执行）。
+- DeepSeek Harness installed (`npm install -g @deepseek-ai/dsh`, or a desktop app built on it, or `npx @deepseek-ai/dsh web`).
+- Option A (recommended) needs **pnpm**: `npm install -g pnpm` (or `corepack enable`).
+- Make sure `dsh` is on PATH (for the desktop app, run in its bundled terminal).
 
-### 1. 方法 A（推荐）：一条命令安装
+### 1. Method A (recommended): one command
 
 ```bash
-dsh plugin --profile web add @feiyang666/deepseekharnessdesktop
+dsh plugin --profile web add @feiyang666/dsh-usage-plugin
 ```
 
-这条命令会做三件事（全部自动）：
+This does three things (all automatic):
 
-1. 在 `~/.dsh/profiles/web` 里通过 pnpm 安装本包（首次使用会自动初始化该 profile）；
-2. 检测到包的 `dsh.bundle` 声明，自动把包名写进 profile 的 `dsh.profile.bundles` 层列表；
-3. 重启后，DSH 启动时会自动读取包内的 `cordis.patch.yml`，把插件行挂进应用树——**不需要**手动编辑任何配置文件。
+1. Installs the package via pnpm into `~/.dsh/profiles/web` (auto-initializes the profile on first use);
+2. Detects the package's `dsh.bundle` declaration and writes the package name into the profile's `dsh.profile.bundles` layer list;
+3. After restart, DSH reads the package's `cordis.patch.yml` and mounts the plugin row into the app tree — **no manual config editing**.
 
-其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
+Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-deepseekharnessdesktop-1.1.0.tgz`
+> Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.9.0.tgz`
 
-### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
+### 2. Method B: manual install (no pnpm / no `dsh plugin`)
 
-只在没有 pnpm 或需要完全手工控制时才用。请**不要在 `~/.dsh/profiles` 根目录直接 `npm install`**（该目录没有 package.json，npm 会把整个 node_modules 当残留清掉）。
+Only for when you have no pnpm or want full manual control. **Do not `npm install` directly at `~/.dsh/profiles`** (that dir has no package.json; npm would treat the whole node_modules as residue and wipe it).
 
-**B1. 用 pnpm 但不用 `dsh plugin`：**
+**B1. Use pnpm but not `dsh plugin`:**
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add @feiyang666/deepseekharnessdesktop
-# 然后手动把插件行加进 web/cordis.patch.yml（见 B3），再重启
+pnpm add @feiyang666/dsh-usage-plugin
+# then manually append the plugin row to web/cordis.patch.yml (see B3) and restart
 ```
 
-**B2. 或用 npm：** 在 profile 目录先补一个最小 package.json 再装：
+**B2. Or use npm:** add a minimal package.json to the profile first, then install:
 
 ```bash
 cd ~/.dsh/profiles/web
-# 若该目录还没有 package.json（用 dsh plugin 初始化过才会有）：
+# if no package.json exists there yet (only after `dsh plugin` init):
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install @feiyang666/deepseekharnessdesktop
+npm install @feiyang666/dsh-usage-plugin
 ```
 
-**B3. 接线（只需做一次，幂等）：** 在 `~/.dsh/profiles/web/cordis.patch.yml` 末尾追加：
+**B3. Wire it up (once, idempotent):** append to `~/.dsh/profiles/web/cordis.patch.yml`:
 
 ```yaml
 - insert:
     - id: usage-plugin
-      name: '@feiyang666/deepseekharnessdesktop'
+      name: '@feiyang666/dsh-usage-plugin'
       inject:
         - fs
         - webServer
@@ -143,107 +153,93 @@ npm install @feiyang666/deepseekharnessdesktop
         - agents
 ```
 
-也可以直接跑包内的接线脚本（自动找 profile 并追加，幂等）：
+Or just run the package's built-in wiring script (auto-finds the profile and appends, idempotent):
 
 ```bash
-node node_modules/@feiyang666/deepseekharnessdesktop/scripts/wire.js
+node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 ```
 
-> ⚠️ 行上的 `inject` 列表**不能省略**：它让 Cordis 等到 `fs` / `webServer` / `subprocess` / `credentials` / `sandboxPolicy` / `agents` 服务就绪后再激活插件。缺了它，`/usage/api` 路由不会注册，面板会报 `Unexpected end of JSON input`。
+> ⚠️ The `inject` list is **required**: it makes Cordis wait until `fs` / `webServer` / `subprocess` / `credentials` / `sandboxPolicy` / `agents` are ready before activating the plugin. Without it the `/usage/api` route never registers and the panel fails with `Unexpected end of JSON input`.
 
-### 3. 方法 C：桌面应用
+### 3. Method C: desktop app
 
-桌面版（如 [DeepSeek Harness 桌面版](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)）底层就是同一个 `~/.dsh/profiles`。在任意终端执行方法 A 的命令即可，装完重启应用；应用内启动的是同一个 `dsh web`，插件自动生效。
+The desktop app (e.g. [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)) uses the same `~/.dsh/profiles` underneath. Run Method A's command in any terminal, restart the app, and the plugin activates automatically (the app starts the same `dsh web`).
 
-### 4. 重启并验证
+### 4. Restart and verify
 
-重启 DeepSeek Harness 的 web 应用（命令行：结束旧进程后重新运行 `dsh web`；桌面应用：完全退出后重新打开）。然后：
+Restart the DeepSeek Harness web app (command line: kill the old process and re-run `dsh web`; desktop: fully quit and reopen). Then:
 
-- 刷新 http://127.0.0.1:3080 ，顶部「对话」「轨迹」之后会出现 **「用量与消耗」** 和 **「剩余余额查询」** 两个 tab；设置里也有对应入口。
-- 「用量与消耗」面板内含 **概览 / 用量日历 / 缓存命中列表 / 价格表** 四个子页签。
-- 发一条消息后，「用量与消耗」面板应出现本次调用的 token / 消耗记录。
+- Refresh http://127.0.0.1:3080 — after "Conversation" and "Trace", you should see **"Usage & Cost"** and **"Balance Query"** tabs; there are entries in Settings too.
+- The "Usage & Cost" panel contains **Overview / Usage Calendar / Cache Hit List / Price Table** subtabs.
+- Send a message and the "Usage & Cost" panel should show this call's token / cost record.
 
-### 5. 配置（余额查询需要）
+### 5. Configuration (for balance query)
 
-「剩余余额查询」使用当前配置的 `DEEPSEEK_API_KEY`：在 **设置 → 模型** 中配置 API Key（与跑对话用的同一个 key），然后打开「剩余余额查询」tab 点「查询余额」。
+"Balance Query" uses the configured `DEEPSEEK_API_KEY`: set the API Key in **Settings → Models** (same key used for chats), then open the "Balance Query" tab and click "Query Balance".
 
 ---
 
-## 卸载
+## Uninstall
 
 ```bash
-dsh plugin --profile web remove @feiyang666/deepseekharnessdesktop
+dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 ```
 
-（等价于 pnpm remove；`dsh plugin` 会自动把包名从 `dsh.profile.bundles` 层列表里移除。）然后重启应用即可。
+(Equivalent to pnpm remove; `dsh plugin` auto-removes the package name from the `dsh.profile.bundles` layer list.) Restart the app afterward.
 
-手工安装的（方法 B），反向操作：删除 `cordis.patch.yml` 里的 `usage-plugin` 行，再 `pnpm remove` / `npm uninstall` 该包，重启。
+For manual installs (Method B), do it in reverse: remove the `usage-plugin` row from `cordis.patch.yml`, then `pnpm remove` / `npm uninstall` the package, and restart.
 
-> 从 1.0.x 手工接线版升级到 1.1.x 时：先删掉旧 `cordis.patch.yml` 里的 `usage-plugin` 行（或整体按卸载流程走一遍），再按方法 A 重装，避免同一插件被挂载两次。
-
----
-
-## 数据与位置
-
-- 数据文件：`<会话工作区>/dsh-usage/usage-records.json`
-- 价格配置（面板内编辑后保存）：`<会话工作区>/dsh-usage/pricing.json`
-- 导出目录（默认）：`<会话工作区>/dsh-usage/{csv,json,images}/`
-- 自定义导出目录：在面板「导出目标目录」里填写或点「选择目录…」
-- 启动诊断日志（若插件激活失败）：会话工作区下的 `dsh-usage-boot.log`
+> Upgrading from a 1.0.x manual-wiring install to 1.1.x: first remove the old `usage-plugin` row from `cordis.patch.yml` (or follow the uninstall flow), then reinstall via Method A to avoid mounting the plugin twice.
 
 ---
 
-## 常见问题
+## Data & locations
 
-| 现象 | 原因 / 处理 |
+- Records: `<session workspace>/dsh-usage/usage-records.json`
+- Price config (edited & saved in the panel): `<session workspace>/dsh-usage/pricing.json`
+- Default export dir: `<session workspace>/dsh-usage/{csv,json,images}/`
+- Custom export dir: set in the panel's "Export target directory" or click "Choose directory…"
+- Startup diagnostics (if the plugin fails to activate): `dsh-usage-boot.log` in the session workspace
+
+---
+
+## FAQ
+
+| Symptom | Cause / Fix |
 | --- | --- |
-| 面板报 `Unexpected end of JSON input` | 插件行缺少 `inject` 列表，路由未注册。按方法 B3 补上 inject 后重启 |
-| 面板一直空白 / 顶部无 tab | 插件未激活。看会话工作区 `dsh-usage-boot.log`；确认 `cordis.patch.yml` 里的行存在且 `name` 正确 |
-| 余额查询失败「未配置 DEEPSEEK_API_KEY」 | 在 设置 → 模型 里配置 API Key |
-| 余额查询失败网络错误 | 确认能访问 `api.deepseek.com`（国内网络请配置代理） |
-| `dsh plugin` 报 pnpm not found | 安装 pnpm：`npm install -g pnpm` |
-| 安装时连不上 npm 官方源 | 配置镜像：`npm config set registry https://registry.npmmirror.com`（或对 pnpm 设 `pnpm config set registry ...`）后再执行安装命令 |
-| 卸载后仍报 `Cannot find package '@feiyang666/...'` | profile 里残留了包引用。删掉 `cordis.patch.yml` 中对应行与 `dsh.profile.bundles` 里的包名，重启 |
+| Panel reports `Unexpected end of JSON input` | The plugin row is missing the `inject` list, so the route isn't registered. Add the inject list per Method B3 and restart |
+| Panel blank / no top tab | Plugin not activated. Check `dsh-usage-boot.log`; confirm the `cordis.patch.yml` row exists with the correct `name` |
+| Balance query fails with "DEEPSEEK_API_KEY not configured" | Set the API Key in Settings → Models |
+| Balance query network error | Ensure `api.deepseek.com` is reachable (configure a proxy if needed) |
+| `dsh plugin` reports pnpm not found | Install pnpm: `npm install -g pnpm` |
+| Install can't reach the npm registry | Set a mirror: `npm config set registry https://registry.npmmirror.com` (or `pnpm config set registry ...`) and retry |
+| After uninstall, still reports `Cannot find package '@feiyang666/...'` | A package reference remains in the profile. Remove the corresponding row from `cordis.patch.yml` and the package name from `dsh.profile.bundles`, then restart |
 
 ---
 
-## 发布到 npm（给维护者）
+## Related Projects
 
-```bash
-npm login                                  # 用你自己的 npm 账号
-npm run check                              # 发布前自检（prepublishOnly 也会自动跑）
-npm pack                                   # 检查 tarball 内容
-npm publish --access public                # 作用域包必须 --access public
-```
-
-> 发布到公共 npm 会公开源码，请确认包内无敏感信息（API Key 等只在运行时由用户配置）。
-> 本机网络若连不上 `registry.npmjs.org`，发布前用 `npm config set registry https://registry.npmjs.org`（包内 `.npmrc` 已预置该 registry）。
-
----
-
-## 相关项目
-
-| 项目 | 说明 | 安装方式 |
+| Project | Description | Installation |
 | --- | --- | --- |
-| [DeepSeek Harness 桌面版](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop) | Windows 桌面控制台：一键安装/启动/停止/重启 dsh web 服务，内置插件管理，**推荐插件区一键安装本插件** | 下载桌面版，点几下即可 |
-| [数据保险箱（dsh-vault）](https://github.com/feiyang-dev/deepseekharnessdesktop-vault) | 自动备份 / 清空检测 / 一键恢复，保护聊天记录与工作区数据 | 桌面端一键安装，或 `dsh plugin add @feiyang666/deepseekharnessdesktop-vault` |
-| [DeepSeek-Harness](https://github.com/deepseek-ai/DeepSeek-Harness) | 官方 CLI / Web 服务 | 见下方「运行 DeepSeek Harness」 |
+| [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop) | Windows desktop console: install/start/stop/restart the dsh web service with one click, built-in plugin management — **install this plugin from its Recommended section** | Download the desktop app and click a few buttons |
+| [Data Vault (dsh-vault)](https://github.com/feiyang-dev/dsh-vault) | Auto backup / wipe detection / one-click restore — protects chat history and workspace data | One-click from the desktop app, or `dsh plugin add @feiyang666/dsh-vault` |
+| [DeepSeek-Harness](https://github.com/deepseek-ai/DeepSeek-Harness) | Official CLI / Web service | Quick start below |
 
-### 运行 DeepSeek Harness
+### Running DeepSeek Harness
 
-**快速安装（通过 npm）**
+**Quick start (via npm)**
 
-安装 Node.js，然后运行：
+Install Node.js, then run:
 
 ```bash
 npx @deepseek-ai/dsh web
 ```
 
-该命令会启动 Web UI，默认地址为 http://127.0.0.1:3080。详见 [Web UI 指南](https://github.com/deepseek-ai/DeepSeek-Harness)。
+This command starts the Web UI at the default address http://127.0.0.1:3080. See the [Web UI Guide](https://github.com/deepseek-ai/DeepSeek-Harness) for details.
 
-**从源码运行**
+**Run from source**
 
-如需从仓库源码运行：
+To run from the repository source:
 
 ```bash
 git clone https://github.com/deepseek-ai/deepseek-harness.git
@@ -253,10 +249,10 @@ pnpm run build
 pnpm dsh web
 ```
 
-## 致谢
+## Acknowledgements
 
-- **[@liu3734](https://github.com/liu3734)**：报告并定位 macOS（POSIX）下路径处理与 spawn 的 Windows 专用问题，提出跨平台修复方案（[#1](https://github.com/feiyang-dev/dsh-usage-plugin/issues/1)）。
+- **[@liu3734](https://github.com/liu3734)**: reported and diagnosed the Windows-only path handling / spawn issues on macOS (POSIX) and proposed the cross-platform fix ([#1](https://github.com/feiyang-dev/dsh-usage-plugin/issues/1)).
 
-## 许可
+## License
 
 MIT © dsh-usage-plugin

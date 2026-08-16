@@ -1,6 +1,6 @@
 # 更新日志 / Changelog
 
-`@feiyang666/deepseekharnessdesktop` — DeepSeek Harness 用量与消耗插件
+`@feiyang666/dsh-usage-plugin` — DeepSeek Harness 用量与消耗插件
 
 本文件按版本记录每一次更新的详细内容（新功能 / 优化 / 修复 / 界面 / 性能）。每次发布到 GitHub 时，请据此填写「版本发布」（GitHub Releases）的更新说明。
 
