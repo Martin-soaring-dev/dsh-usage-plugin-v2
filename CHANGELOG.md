@@ -8,9 +8,9 @@
 
 ---
 
-## 未发布
+## v1.9.1 (2026-08-16)
 
-- 暂无待发布改动。
+- **文档**: README 改为英文优先（`README.md` 英文 + 新增 `README.zh.md` 中文）；补充「npm 包名已更换」醒目通知（旧包名 `@feiyang666/deepseekharnessdesktop` → 新包名 `@feiyang666/dsh-usage-plugin`），并移除发布教程等无关内容；修正 tarball 测试命令为新包名文件名。
 
 ---
 
