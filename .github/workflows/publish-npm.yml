@@ -9,7 +9,7 @@ on:
       - .github/npm-publish-request.json
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 concurrency:
@@ -41,6 +41,8 @@ jobs:
           node -e "const p=require('./package.json'); if(p.name!=='dsh-usage-plugin-v2'||p.version!=='1.11.0') throw new Error('unexpected package identity: '+p.name+'@'+p.version)"
 
       - name: Authenticate, publish, and verify
+        id: npm_publish
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -69,3 +71,46 @@ jobs:
 
           echo "::error::npm did not return dsh-usage-plugin-v2@1.11.0 after publication."
           exit 1
+
+      - name: Record publication result
+        if: always()
+        uses: actions/github-script@v8
+        env:
+          PUBLISH_OUTCOME: ${{ steps.npm_publish.outcome }}
+        with:
+          script: |
+            const path = '.github/npm-publish-result.json'
+            const payload = JSON.stringify({
+              package: 'dsh-usage-plugin-v2',
+              version: '1.11.0',
+              outcome: process.env.PUBLISH_OUTCOME || 'unknown',
+              runId: context.runId,
+              runUrl: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              workflowCommit: context.sha,
+              recordedAt: new Date().toISOString()
+            }, null, 2) + '\n'
+
+            let sha
+            try {
+              const response = await github.rest.repos.getContent({
+                ...context.repo,
+                path,
+                ref: 'main'
+              })
+              if (!Array.isArray(response.data)) sha = response.data.sha
+            } catch (error) {
+              if (error.status !== 404) throw error
+            }
+
+            await github.rest.repos.createOrUpdateFileContents({
+              ...context.repo,
+              path,
+              branch: 'main',
+              message: 'ci: record independent npm publication result',
+              content: Buffer.from(payload).toString('base64'),
+              ...(sha ? { sha } : {})
+            })
+
+      - name: Fail when publication did not succeed
+        if: always() && steps.npm_publish.outcome != 'success'
+        run: exit 1
