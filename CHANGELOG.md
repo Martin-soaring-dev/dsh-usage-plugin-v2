@@ -10,9 +10,9 @@
 
 ## Unreleased
 
-- **SiliconFlow 配置跟随**：余额查询会优先读取匹配的 `llm-pi-ai` 模型提供商配置（`apiKeyEnv` 与官方 `.cn` / `.com` `baseURL`），并在返回 0 时展示实际凭据来源、路由与端点，方便区分“查询成功为 0”与“配置错账户”。
+- **SiliconFlow 配置跟随**：余额查询只读取匹配的 `llm-pi-ai` 模型提供商配置（Provider ID / 显示名为 `siliconflow`）及其 `apiKeyEnv`；缺少提供商或 Key 时给出明确修复步骤，返回 0 时忠实展示公开 API 字段及定义。
 - **凭据安全**：SiliconFlow 推理 Key 仅会发送到官方 `api.siliconflow.cn` / `api.siliconflow.com`，不会发送到任意自定义网关。
-- **DigitalOcean 引导**：缺少账户级 PAT 时明确提示 `billing:read` 权限，并提供 Token 创建入口；继续拒绝把 DO AI 推理 Key 当作账单凭据。
+- **DigitalOcean 账单凭据**：余额页可输入并安全保存账户级 PAT，保存后只显示遮罩值；查询 Billing API 后只展示当前余额与本月至今使用，不请求账单明细。
 - **AMD GPU Cloud 引导**：将无公开余额 API 的状态改为中性“仅支持控制台查看”，并增加 AMD Developer Cloud 官方入口。
 - **余额面板界面**：修复 DeepSeek“可用”徽标被 flex 布局拉伸成整行的问题；DeepSeek 响应未返回 `is_available` 时不再误判为不可用。
 

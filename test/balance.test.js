@@ -50,6 +50,8 @@ test('normalizes researched SiliconFlow user info fields', () => {
   assert.equal(res.totalBalance, '12.00')
   assert.equal(res.zeroBalance, false)
   assert.deepEqual(res.details.map((d) => d.value), ['8.75', '3.25'])
+  assert.deepEqual(res.fieldDefinitions.map((d) => d.name), ['totalBalance', 'chargeBalance', 'balance'])
+  assert.match(res.sourceNote, /代金券/)
 })
 
 test('marks a successful all-zero SiliconFlow response for UI diagnostics', () => {
@@ -97,7 +99,28 @@ test('normalizes DigitalOcean account billing balance', () => {
   assert.equal(res.ok, true)
   assert.equal(res.currency, 'USD')
   assert.equal(res.totalBalance, '12.23')
-  assert.deepEqual(res.details.map((d) => d.value), ['11.21', '23.44'])
+  assert.equal(res.balanceKind, 'due')
+  assert.equal(res.balanceLabel, '待结算账户余额')
+  assert.equal(res.monthToDateUsage, '11.21')
+  assert.equal(res.monthToDateBalance, '23.44')
+  assert.deepEqual(res.details.map((d) => d.value), ['11.21'])
+})
+
+test('shows a negative DigitalOcean account balance as available credit', () => {
+  const res = parseBalanceResponse('digitalocean', JSON.stringify({
+    month_to_date_balance: '-13.00',
+    account_balance: '-13.00',
+    month_to_date_usage: '0.00',
+    generated_at: '2026-08-18T06:35:32Z'
+  }))
+  assert.equal(res.ok, true)
+  assert.equal(res.totalBalance, '13')
+  assert.equal(res.balanceKind, 'credit')
+  assert.equal(res.balanceLabel, '可用信用余额')
+  assert.equal(res.rawAccountBalance, '-13.00')
+  assert.equal(res.monthToDateUsage, '0.00')
+  assert.equal(res.monthToDateBalance, '-13.00')
+  assert.deepEqual(res.details.map((d) => d.value), ['0.00'])
 })
 
 test('rejects API errors and unrecognized response shapes', () => {

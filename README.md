@@ -47,8 +47,8 @@ dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ec
 | Provider | Status | Credential | Balance details |
 | --- | --- | --- | --- |
 | DeepSeek | ✅ API query | `DEEPSEEK_API_KEY` | Total, topped-up, and granted balance |
-| SiliconFlow | ✅ API query | Matching model provider's `apiKeyEnv`, or `SILICONFLOW_API_KEY` | Total, charged, and free balance |
-| DigitalOcean | ✅ Account Billing API | `DIGITALOCEAN_TOKEN` or `DIGITALOCEAN_ACCESS_TOKEN` ([create token](https://cloud.digitalocean.com/account/api/tokens)) | Account balance plus month-to-date usage and balance (USD) |
+| SiliconFlow | ✅ API query | `apiKeyEnv` from the model provider whose ID or display name is `siliconflow` | Public API total, charged, and legacy granted balance fields |
+| DigitalOcean | ✅ Account Billing API | Save an account PAT as `DIGITALOCEAN_TOKEN` on the Balance page ([create token](https://cloud.digitalocean.com/account/api/tokens)) | Current account balance and month-to-date usage (USD), without billing history |
 | AMD GPU Cloud | ℹ️ Console only | — | Check credits in [AMD Developer Cloud](https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html); no public inference-key balance endpoint is documented |
 
 The AMD entry is intentionally visible in the selector so users get a clear support status instead of a failed request to a guessed endpoint.
@@ -160,6 +160,7 @@ npm install @feiyang666/dsh-usage-plugin
         - webServer
         - subprocess
         - credentials
+        - settings
         - sandboxPolicy
         - agents
 ```
@@ -170,7 +171,7 @@ Or just run the package's built-in wiring script (auto-finds the profile and app
 node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 ```
 
-> ⚠️ The `inject` list is **required**: it makes Cordis wait until `fs` / `webServer` / `subprocess` / `credentials` / `sandboxPolicy` / `agents` are ready before activating the plugin. Without it the `/usage/api` route never registers and the panel fails with `Unexpected end of JSON input`.
+> ⚠️ The `inject` list is **required**: it makes Cordis wait until `fs` / `webServer` / `subprocess` / `credentials` / `settings` / `sandboxPolicy` / `agents` are ready before activating the plugin. Without it the `/usage/api` route never registers and the panel fails with `Unexpected end of JSON input`.
 
 ### 3. Method C: desktop app
 
@@ -191,11 +192,11 @@ The balance panel selects credentials by provider. Add the applicable credential
 | Provider | Query source | Important note |
 | --- | --- | --- |
 | DeepSeek | `GET https://api.deepseek.com/user/balance` | Uses the same inference key configured for DeepSeek models |
-| SiliconFlow | `GET /v1/user/info` on the matching official `.cn` / `.com` API host | First uses the matching model provider's `apiKeyEnv` and official `baseURL`, then falls back to `SILICONFLOW_API_KEY` |
-| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | Requires an [account-level Personal Access Token](https://cloud.digitalocean.com/account/api/tokens) with `billing:read`; a DO AI inference key is not sufficient |
+| SiliconFlow | `GET /v1/user/info` on the matching official `.cn` / `.com` API host | Requires a model provider whose ID or display name is `siliconflow`; only that provider's `apiKeyEnv` is used, with no standalone-key fallback |
+| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | Enter an [account-level Personal Access Token](https://cloud.digitalocean.com/account/api/tokens) with `billing:read` on the Balance page; it is stored by the DSH credentials service and masked after saving |
 | AMD GPU Cloud | [AMD Developer Cloud](https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html) | Selecting it shows a console-only status and sends no balance request |
 
-Open the **Balance Query** tab, select the provider, and click **Query Balance**. Requests run on the host side and the credential value is not returned to the browser UI. For security, a SiliconFlow model credential is sent only to `api.siliconflow.cn` or `api.siliconflow.com`, never to an arbitrary custom gateway. DigitalOcean requires a separate account-level Personal Access Token with `billing:read`; the plugin does not reuse or reinterpret an inference key as a billing credential.
+Open the **Balance Query** tab and select a provider. Requests run on the host side and credential values are never returned to the browser UI. For security, a SiliconFlow model credential is sent only to `api.siliconflow.cn` or `api.siliconflow.com`, never to an arbitrary custom gateway. On the DigitalOcean tab, save the account PAT and the plugin immediately queries only the balance summary endpoint; it does not request billing history or reuse an inference key.
 
 ---
 
@@ -229,7 +230,7 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 | --- | --- |
 | Panel reports `Unexpected end of JSON input` | The plugin row is missing the `inject` list, so the route isn't registered. Add the inject list per Method B3 and restart |
 | Panel blank / no top tab | Plugin not activated. Check `dsh-usage-boot.log`; confirm the `cordis.patch.yml` row exists with the correct `name` |
-| Balance query reports a credential is not configured | Add the credential named in the message: `DEEPSEEK_API_KEY`, `SILICONFLOW_API_KEY`, or an account-level `DIGITALOCEAN_TOKEN` / `DIGITALOCEAN_ACCESS_TOKEN` |
+| Balance query reports a credential is not configured | For SiliconFlow, add/edit the model provider named `siliconflow` and save its API Key. For DigitalOcean, paste the account PAT into its Balance tab and click **Save and query** |
 | SiliconFlow balance response cannot be recognized | Confirm the key can access `api.siliconflow.cn/v1/user/info`; the plugin recognizes `totalBalance`, `chargeBalance`, and `balance` |
 | DigitalOcean returns 401 / 403 | Use a DigitalOcean account Personal Access Token with billing read access, not a DO AI inference key |
 | AMD GPU Cloud says balance query is unsupported | This is expected: no public balance endpoint is currently documented for its inference key; view the balance in the provider console |

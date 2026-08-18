@@ -56,7 +56,7 @@ if (typeof bundlePatch === "string") {
 		const text = readFileSync(patchPath, "utf8");
 		check(text.includes("- insert:"), `bundle patch ${bundlePatch} must contain a top-level "- insert:" entry`);
 		check(text.includes(`name: '${pkg.name}'`) || text.includes(`name: "${pkg.name}"`), `bundle patch ${bundlePatch} must insert an entry with name: '${pkg.name}'`);
-		const required = ["fs", "webServer", "subprocess", "credentials", "sandboxPolicy", "agents"];
+		const required = ["fs", "webServer", "subprocess", "credentials", "settings", "sandboxPolicy", "agents"];
 		const missing = required.filter((service) => !text.includes(`- ${service}`));
 		check(missing.length === 0, `bundle patch ${bundlePatch} is missing inject entries: ${missing.join(", ")}`);
 	}
