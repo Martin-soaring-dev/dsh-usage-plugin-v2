@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: '20'
       - name: Apply patch
-        run: node scripts/patch-v1.13.0.js
+        run: node scripts/apply-v1.13.0-safe.js
       - name: Validate syntax and tests
         run: |
           node --check lib/index.js
@@ -37,5 +37,3 @@ jobs:
           fi
           git commit -m 'feat: provider-aware pricing and usage UI'
           git push origin HEAD:main
-
-# retriggered after workflow was present on the default branch
