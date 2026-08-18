@@ -1,12 +1,12 @@
 <div align="center">
 
-# DeepSeek Harness Usage & Cost Tracker (dsh-usage-plugin)
+# DeepSeek Harness Usage & Cost Tracker v2
 
 **English** · [简体中文](./README.zh.md)
 
-[GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
+[This project](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [Original project](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
 
-**A community plugin for DeepSeek Harness** — records token usage and cost for every model call, with peak/off-peak billing, multi-provider balance queries, a calendar heatmap, and CSV / JSON / PNG export.
+**A reproduced and extended community edition of the original project** — preserving its complete usage and cost tracker while adding explicit credential handling, field definitions, and safety boundaries for multi-provider balance queries.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -15,6 +15,63 @@
 </div>
 
 ---
+
+## Part I: Why This Fork Exists and What It Changes
+
+### Motivation
+
+This repository reproduces and continues the work of [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin). The original project already solved the core DeepSeek Harness problems around model-call records, token usage, peak/off-peak pricing, cache hits, calendar statistics, and data export. At the point this repository was forked, however, balance lookup was centered on DeepSeek, while real Harness installations often configure SiliconFlow, DigitalOcean, AMD GPU Cloud, and other providers together.
+
+Those providers do not share one credential or billing model: some expose balance data to an inference API key, some require a separate account token, and some publish no balance endpoint that an inference key can call. The goal of v2 is therefore not just to add provider buttons. It preserves the original tracker while making it clear which key is used, which endpoint is queried, what each returned field means, and why a provider cannot be queried when no documented interface exists.
+
+This project does not impersonate or replace the original. Credit for the original design, code, and contributions remains with its authors and contributors under the MIT License.
+
+### What This Fork Adds
+
+- Extends the balance page to **DeepSeek, SiliconFlow, DigitalOcean, and AMD GPU Cloud**, while retaining the original usage, cost, calendar, cache, pricing, import/export, and persistence features.
+- **SiliconFlow**: reads only the configured model provider whose ID or display name is `siliconflow`, then follows that provider's `apiKeyEnv` to the saved key. Only official SiliconFlow `.cn` / `.com` hosts are accepted. The UI faithfully presents public API fields such as `totalBalance`, `chargeBalance`, and `balance`, including a genuine zero response instead of substituting a console value.
+- **DigitalOcean**: explicitly requires an account-level Personal Access Token rather than a Gradient AI inference key. The page links to token creation, explains the required permission, and masks the token after saving. It queries the account Billing API and shows only current account balance and month-to-date usage—never billing-history line items. A negative account balance is rendered as available credit according to DigitalOcean's accounting semantics.
+- **AMD GPU Cloud**: because no documented balance endpoint is available to its inference key, the plugin does not guess an endpoint or misuse that key as a billing credential. It links to the official console and clearly labels the limitation.
+- Keeps balance requests on the Host side so plaintext credentials are not returned to the client, and adds automated contract tests for these provider rules and boundaries.
+
+### Differences from the Original Project
+
+“Original project” below means the baseline reproduced by this repository; upstream may continue to evolve independently.
+
+| Area | Original project (fork baseline) | This v2 project |
+| --- | --- | --- |
+| Core tracker | Usage and cost statistics, peak/off-peak pricing, calendar, cache hits, price table, import/export, and persistence | Fully retained, including compatibility with existing data and UI flows |
+| Balance providers | Primarily DeepSeek balance lookup | DeepSeek, SiliconFlow, and DigitalOcean; AMD GPU Cloud is explicitly console-only |
+| Credential source | Primarily an inference API key | Provider-aware: SiliconFlow follows the model provider's `apiKeyEnv`; DigitalOcean stores a separate account PAT |
+| Response semantics | Presents DeepSeek balance fields | Defines SiliconFlow fields and explains DigitalOcean account balance, available credit, and month-to-date usage |
+| Unsupported APIs | No multi-provider support-status model | Never calls an undocumented AMD balance endpoint and explains the limitation in the UI |
+| Security and verification | Retains the original Host + Client plugin architecture | Host-side balance calls, masked token storage, official-host restrictions for SiliconFlow, and provider contract tests |
+
+### New Balance Query Screenshots
+
+#### SiliconFlow
+
+The plugin discovers the credential from the matching model provider and explains both the public API fields and the returned value.
+
+![SiliconFlow balance query and field definitions](./docs/assets/balance-siliconflow.png)
+
+#### DigitalOcean
+
+The account PAT is masked after saving. The page shows available credit, current-month usage, and query time without billing-history details.
+
+![DigitalOcean account balance and month-to-date usage](./docs/assets/balance-digitalocean.png)
+
+#### AMD GPU Cloud
+
+When no public endpoint exists, the plugin states the limitation and points users to the official console for credits.
+
+![AMD GPU Cloud console-only guidance](./docs/assets/balance-amd-gpu-cloud.png)
+
+---
+
+## Part II: Original Project Introduction (Reproduced and Adapted)
+
+> The material below reproduces and preserves the original project's core introduction, installation guidance, and data documentation. Provider coverage, credential rules, and screenshots have been adapted to match this v2 implementation. For the source project and its history, see [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin).
 
 > ## 🔔 Important Notice (2026-08-16): npm package renamed
 >
@@ -26,7 +83,7 @@
 
 ---
 
-## Overview
+### Overview
 
 dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem (a DSH plugin shipped as a Host + Client two-in-one package). After installation, **"Usage & Cost"** and **"Balance Query"** tabs appear in the Web UI, right after "Conversation" and "Trace":
 
@@ -42,7 +99,7 @@ dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ec
 - **Persistence**: records are written live to `<session workspace>/dsh-usage/usage-records.json` and restored on restart (cap 100000 records).
 - **UI adaptation**: panel typography scales with the app's display-size setting (em-relative fonts); table wrapping and spacing are tuned so large display sizes stay readable.
 
-### Balance provider support
+#### Balance provider support
 
 | Provider | Status | Credential | Balance details |
 | --- | --- | --- | --- |
@@ -55,23 +112,23 @@ The AMD entry is intentionally visible in the selector so users get a clear supp
 
 ---
 
-## Screenshots
+### Screenshots
 
-### Usage & Consumption
+#### Usage & Consumption
 ![Usage & Consumption](./docs/assets/usage-overview.png)
 
-### Balance Query
+#### Balance Query
 ![Balance Query](./docs/assets/balance-query.png)
 
-## Recommended Installation
+### Recommended Installation
 
 > Either method works and is equivalent. **We recommend the desktop app** — fully graphical, no command line needed.
 
-### Option 1 (recommended): One-click via the desktop app
+#### Option 1 (recommended): One-click via the desktop app
 
 Install [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop), open it, then go to **"Install Plugins" → Recommended → Usage & Cost Tracker → Install** and click **"Restart Service Now"** to activate.
 
-### Option 2: Command line
+#### Option 2: Command line
 
 ```bash
 # Prerequisite: install dsh (npm install -g @deepseek-ai/dsh)
@@ -89,7 +146,7 @@ Restart the dsh web service after installation. Detailed manual install / wiring
 
 ---
 
-## What's in the package
+### What's in the package
 
 One npm package = a **host half** (Node-side Cordis plugin: recording, billing, balance query, export — see `lib/index.js`) + a **client half** (browser-side panel — see `lib/client.js`, which talks to the host via `/usage/api`).
 
@@ -104,15 +161,15 @@ So for users, **installation is one command** — no YAML editing, no manual fil
 
 ---
 
-## Installation (for users)
+### Installation (for users)
 
-### 0. Prerequisites
+#### 0. Prerequisites
 
 - DeepSeek Harness installed (`npm install -g @deepseek-ai/dsh`, or a desktop app built on it, or `npx @deepseek-ai/dsh web`).
 - Option A (recommended) needs **pnpm**: `npm install -g pnpm` (or `corepack enable`).
 - Make sure `dsh` is on PATH (for the desktop app, run in its bundled terminal).
 
-### 1. Method A (recommended): one command
+#### 1. Method A (recommended): one command
 
 ```bash
 dsh plugin --profile web add @feiyang666/dsh-usage-plugin
@@ -126,9 +183,9 @@ This does three things (all automatic):
 
 Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.10.0.tgz`
+> Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.11.0.tgz`
 
-### 2. Method B: manual install (no pnpm / no `dsh plugin`)
+#### 2. Method B: manual install (no pnpm / no `dsh plugin`)
 
 Only for when you have no pnpm or want full manual control. **Do not `npm install` directly at `~/.dsh/profiles`** (that dir has no package.json; npm would treat the whole node_modules as residue and wipe it).
 
@@ -173,11 +230,11 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 
 > ⚠️ The `inject` list is **required**: it makes Cordis wait until `fs` / `webServer` / `subprocess` / `credentials` / `settings` / `sandboxPolicy` / `agents` are ready before activating the plugin. Without it the `/usage/api` route never registers and the panel fails with `Unexpected end of JSON input`.
 
-### 3. Method C: desktop app
+#### 3. Method C: desktop app
 
 The desktop app (e.g. [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)) uses the same `~/.dsh/profiles` underneath. Run Method A's command in any terminal, restart the app, and the plugin activates automatically (the app starts the same `dsh web`).
 
-### 4. Restart and verify
+#### 4. Restart and verify
 
 Restart the DeepSeek Harness web app (command line: kill the old process and re-run `dsh web`; desktop: fully quit and reopen). Then:
 
@@ -185,7 +242,7 @@ Restart the DeepSeek Harness web app (command line: kill the old process and re-
 - The "Usage & Cost" panel contains **Overview / Usage Calendar / Cache Hit List / Price Table** subtabs.
 - Send a message and the "Usage & Cost" panel should show this call's token / cost record.
 
-### 5. Configuration (for balance query)
+#### 5. Configuration (for balance query)
 
 The balance panel selects credentials by provider. Add the applicable credential to the DSH credentials service before querying.
 
@@ -200,7 +257,7 @@ Open the **Balance Query** tab and select a provider. Requests run on the host s
 
 ---
 
-## Uninstall
+### Uninstall
 
 ```bash
 dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
@@ -214,7 +271,7 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 
 ---
 
-## Data & locations
+### Data & locations
 
 - Records: `<session workspace>/dsh-usage/usage-records.json`
 - Price config (edited & saved in the panel): `<session workspace>/dsh-usage/pricing.json`
@@ -224,7 +281,7 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 
 ---
 
-## FAQ
+### FAQ
 
 | Symptom | Cause / Fix |
 | --- | --- |
@@ -241,7 +298,7 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 
 ---
 
-## Related Projects
+### Related Projects
 
 | Project | Description | Installation |
 | --- | --- | --- |
@@ -249,7 +306,7 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 | [Data Vault (dsh-vault)](https://github.com/feiyang-dev/dsh-vault) | Auto backup / wipe detection / one-click restore — protects chat history and workspace data | One-click from the desktop app, or `dsh plugin add @feiyang666/dsh-vault` |
 | [DeepSeek-Harness](https://github.com/deepseek-ai/DeepSeek-Harness) | Official CLI / Web service | Quick start below |
 
-### Running DeepSeek Harness
+#### Running DeepSeek Harness
 
 **Quick start (via npm)**
 
@@ -273,10 +330,10 @@ pnpm run build
 pnpm dsh web
 ```
 
-## Acknowledgements
+### Acknowledgements
 
 - **[@liu3734](https://github.com/liu3734)**: reported and diagnosed the Windows-only path handling / spawn issues on macOS (POSIX) and proposed the cross-platform fix ([#1](https://github.com/feiyang-dev/dsh-usage-plugin/issues/1)).
 
-## License
+### License
 
 MIT © dsh-usage-plugin

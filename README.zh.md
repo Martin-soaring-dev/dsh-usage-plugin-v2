@@ -1,12 +1,12 @@
 <div align="center">
 
-# DeepSeek Harness 用量与消耗插件（dsh-usage-plugin）
+# DeepSeek Harness 用量与消耗插件 v2
 
 [English](./README.md) | **简体中文**
 
-[GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
+[本项目](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [原项目](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
 
-**由开发者制作的 DeepSeek Harness 插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、多服务商余额查询、日历热力图与 CSV / JSON / PNG 导出。
+**基于原项目复刻并继续增强的社区版本** —— 保留完整的用量与消耗统计能力，并补齐多服务商余额查询所需的凭据识别、字段解释和安全边界。
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -15,6 +15,63 @@
 </div>
 
 ---
+
+## 第一部分：本项目的出发点与改动
+
+### 项目的出发点
+
+本项目基于 [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin) 的公开代码复刻并继续开发。原项目已经解决了 DeepSeek Harness 中模型调用记录、token 用量、峰谷价格、缓存命中、日历统计和数据导出等核心问题；但在本仓库开始复刻时，余额查询主要面向 DeepSeek，而实际使用者往往会同时配置 SiliconFlow、DigitalOcean、AMD GPU Cloud 等不同服务商。
+
+这些服务商的凭据和账单接口并不相同：有的可以使用推理 API Key 查询余额，有的必须使用账户级 Token，有的根本没有公开可由推理 Key 调用的余额端点。因此，v2 的目标不是简单增加几个按钮，而是在保留原项目能力的前提下，把“该用哪把 Key、调用哪个接口、返回字段代表什么、不能查询时如何说明”处理清楚。
+
+本项目不冒充或替代原项目；原始设计、代码和贡献归功于原项目作者及贡献者，并继续遵循 MIT License。
+
+### 本项目做了什么
+
+- 将余额页扩展为 **DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud** 多服务商界面，同时保留原有用量、消耗、日历、缓存、价格、导入导出与持久化功能。
+- **SiliconFlow**：只读取模型设置中 Provider ID 或显示名为 `siliconflow` 的提供商，并跟随该提供商的 `apiKeyEnv` 获取已保存 Key；仅接受 SiliconFlow 官方 `.cn` / `.com` 地址。页面忠实展示公开 API 返回的 `totalBalance`、`chargeBalance`、`balance` 等字段，即使返回值为 0 也不会用控制台余额替换。
+- **DigitalOcean**：明确要求账户级 Personal Access Token，而不是 Gradient AI 推理 Key；页面提供创建链接和权限提示，Token 保存后隐藏显示。查询账户 Billing API，只展示当前账户余额与本月至今使用，不拉取账单历史明细；负账户余额按 DigitalOcean 的记账语义显示为可用信用余额。
+- **AMD GPU Cloud**：由于没有公开文档化的推理 Key 余额接口，不猜测端点、不把推理 Key 当账单凭据，只提供官方控制台入口和清晰的支持状态。
+- 余额请求由 Host 侧完成，明文凭据不返回前端；并为这些服务商契约与边界补充了自动化测试。
+
+### 和原项目的区别
+
+下表中的“原项目”指本仓库复刻时所依据的基线版本；上游后续可能继续变化。
+
+| 维度 | 原项目（复刻基线） | 本项目 v2 |
+| --- | --- | --- |
+| 核心能力 | 用量与消耗统计、峰谷计费、日历、缓存命中、价格表、导入导出和持久化 | 完整保留，并继续兼容原有数据与界面流程 |
+| 余额服务商 | 主要支持 DeepSeek 余额查询 | DeepSeek、SiliconFlow、DigitalOcean；AMD GPU Cloud 明确标为仅控制台查看 |
+| 凭据来源 | 以推理 API Key 为主 | 按服务商区分：SiliconFlow 读取模型 Provider 的 `apiKeyEnv`，DigitalOcean 单独保存账户级 PAT |
+| 返回值说明 | 展示 DeepSeek 余额字段 | 补充 SiliconFlow 字段定义、DigitalOcean 账户余额/信用余额语义与本月至今使用 |
+| 不支持的接口 | 未形成多服务商状态说明 | 不请求未经官方文档确认的 AMD 余额端点，并在界面解释原因 |
+| 安全与验证 | 沿用原项目的 Host + Client 插件结构 | 余额调用留在 Host 侧、Token 隐藏保存、限制 SiliconFlow 官方主机，并增加服务商契约测试 |
+
+### 新增余额查询截图
+
+#### SiliconFlow
+
+自动从匹配的模型 Provider 读取凭据，并同时说明公开 API 的返回字段与查询结果。
+
+![SiliconFlow 余额查询与字段说明](./docs/assets/balance-siliconflow.png)
+
+#### DigitalOcean
+
+账户 PAT 保存后隐藏，只展示可用信用余额、当前月使用与查询时间，不展示账单历史明细。
+
+![DigitalOcean 账户余额与本月使用](./docs/assets/balance-digitalocean.png)
+
+#### AMD GPU Cloud
+
+没有公开可用端点时直接说明限制，并引导前往官方控制台查看 credits。
+
+![AMD GPU Cloud 控制台查看提示](./docs/assets/balance-amd-gpu-cloud.png)
+
+---
+
+## 第二部分：原项目介绍（复刻与适配）
+
+> 以下内容复刻并延续原项目的核心介绍、安装方式与数据说明。为与本项目 v2 的实际行为一致，余额服务商、凭据规则和截图等内容已作适配。原始项目及其历史请参阅 [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin)。
 
 > ## 🔔 重要通知（2026-08-16）：npm 包名已更换
 >
@@ -26,7 +83,7 @@
 
 ---
 
-## 简介
+### 简介
 
 dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**（DSH plugin，Host + Client 双面一体包）。装好后在 WebUI 顶部「对话」「轨迹」之后会出现 **「用量与消耗」** 与 **「剩余余额查询」** 两个 tab：
 
@@ -42,7 +99,7 @@ dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**�
 - **持久化**：记录实时落盘到 `<会话工作区>/dsh-usage/usage-records.json`，重启自动恢复（上限 100000 条，尽量多存）。
 - **界面适配**：面板字号跟随应用「显示大小」设置自动缩放（em 相对字号），面板宽度以视口封顶、宽表格在容器内横向滑动（max-content + overflow-x），任何窗口大小下所有列与合计都完整可见，不会裁掉右侧内容。
 
-### 余额服务商支持情况
+#### 余额服务商支持情况
 
 | 服务商 | 状态 | 凭据 | 展示内容 |
 | --- | --- | --- | --- |
@@ -55,23 +112,23 @@ AMD GPU Cloud 会保留在服务商选择器中并明确说明支持状态，避
 
 ---
 
-## 界面预览
+### 界面预览
 
-### 用量与消耗
+#### 用量与消耗
 ![用量与消耗](./docs/assets/usage-overview.png)
 
-### 剩余余额查询
+#### 剩余余额查询
 ![剩余余额查询](./docs/assets/balance-query.png)
 
-## 推荐安装方式
+### 推荐安装方式
 
 > 两个方法任选其一，效果等价。**推荐使用桌面端**，全程图形化、无需命令行。
 
-### 方式一（推荐）：桌面端一键安装
+#### 方式一（推荐）：桌面端一键安装
 
 安装 [DeepSeek Harness 桌面版](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)，打开后点击 **「安装插件」→ 推荐插件 → 用量与消耗插件 → 一键安装**，完成后点 **「立即重启服务」** 即可生效。
 
-### 方式二：命令行安装
+#### 方式二：命令行安装
 
 ```bash
 # 前提：已安装 dsh（npm install -g @deepseek-ai/dsh）
@@ -89,7 +146,7 @@ dsh plugin --profile headless add @feiyang666/dsh-usage-plugin
 
 ---
 
-## 这个包是什么
+### 这个包是什么
 
 一个 npm 包 = **host 半**（Node 侧 Cordis 插件，负责记录、计费、余额查询、导出，见 `lib/index.js`）+ **client 半**（浏览器侧面板，见 `lib/client.js`，通过 `/usage/api` 与 host 通信）。
 
@@ -104,15 +161,15 @@ dsh plugin --profile headless add @feiyang666/dsh-usage-plugin
 
 ---
 
-## 安装（给使用者）
+### 安装（给使用者）
 
-### 0. 前提条件
+#### 0. 前提条件
 
 - 已安装 DeepSeek Harness（`npm install -g @deepseek-ai/dsh` 全局安装，或使用基于它的桌面应用 / `npx @deepseek-ai/dsh web`）。
 - 安装方式 A（推荐）需要 **pnpm**：`npm install -g pnpm`（或 `corepack enable`）。
 - 确保 `dsh` 命令在 PATH 里（桌面应用自带环境则在其终端中执行）。
 
-### 1. 方法 A（推荐）：一条命令安装
+#### 1. 方法 A（推荐）：一条命令安装
 
 ```bash
 dsh plugin --profile web add @feiyang666/dsh-usage-plugin
@@ -126,9 +183,9 @@ dsh plugin --profile web add @feiyang666/dsh-usage-plugin
 
 其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
 
-> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.10.0.tgz`
+> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.11.0.tgz`
 
-### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
+#### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
 
 只在没有 pnpm 或需要完全手工控制时才用。请**不要在 `~/.dsh/profiles` 根目录直接 `npm install`**（该目录没有 package.json，npm 会把整个 node_modules 当残留清掉）。
 
@@ -173,11 +230,11 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 
 > ⚠️ 行上的 `inject` 列表**不能省略**：它让 Cordis 等到 `fs` / `webServer` / `subprocess` / `credentials` / `settings` / `sandboxPolicy` / `agents` 服务就绪后再激活插件。缺了它，`/usage/api` 路由不会注册，面板会报 `Unexpected end of JSON input`。
 
-### 3. 方法 C：桌面应用
+#### 3. 方法 C：桌面应用
 
 桌面版（如 [DeepSeek Harness 桌面版](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)）底层就是同一个 `~/.dsh/profiles`。在任意终端执行方法 A 的命令即可，装完重启应用；应用内启动的是同一个 `dsh web`，插件自动生效。
 
-### 4. 重启并验证
+#### 4. 重启并验证
 
 重启 DeepSeek Harness 的 web 应用（命令行：结束旧进程后重新运行 `dsh web`；桌面应用：完全退出后重新打开）。然后：
 
@@ -185,7 +242,7 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 - 「用量与消耗」面板内含 **概览 / 用量日历 / 缓存命中列表 / 价格表** 四个子页签。
 - 发一条消息后，「用量与消耗」面板应出现本次调用的 token / 消耗记录。
 
-### 5. 配置（余额查询需要）
+#### 5. 配置（余额查询需要）
 
 余额面板按服务商读取不同凭据。查询前，请将相应凭据添加到 DSH 凭据服务。
 
@@ -200,7 +257,7 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 
 ---
 
-## 卸载
+### 卸载
 
 ```bash
 dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
@@ -214,7 +271,7 @@ dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 
 ---
 
-## 数据与位置
+### 数据与位置
 
 - 数据文件：`<会话工作区>/dsh-usage/usage-records.json`
 - 价格配置（面板内编辑后保存）：`<会话工作区>/dsh-usage/pricing.json`
@@ -224,7 +281,7 @@ dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 
 ---
 
-## 常见问题
+### 常见问题
 
 | 现象 | 原因 / 处理 |
 | --- | --- |
@@ -241,7 +298,7 @@ dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 
 ---
 
-## 相关项目
+### 相关项目
 
 | 项目 | 说明 | 安装方式 |
 | --- | --- | --- |
@@ -249,7 +306,7 @@ dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 | [数据保险箱（dsh-vault）](https://github.com/feiyang-dev/dsh-vault) | 自动备份 / 清空检测 / 一键恢复，保护聊天记录与工作区数据 | 桌面端一键安装，或 `dsh plugin add @feiyang666/dsh-vault` |
 | [DeepSeek-Harness](https://github.com/deepseek-ai/DeepSeek-Harness) | 官方 CLI / Web 服务 | 见下方「运行 DeepSeek Harness」 |
 
-### 运行 DeepSeek Harness
+#### 运行 DeepSeek Harness
 
 **快速安装（通过 npm）**
 
@@ -273,10 +330,10 @@ pnpm run build
 pnpm dsh web
 ```
 
-## 致谢
+### 致谢
 
 - **[@liu3734](https://github.com/liu3734)**：报告并定位 macOS（POSIX）下路径处理与 spawn 的 Windows 专用问题，提出跨平台修复方案（[#1](https://github.com/feiyang-dev/dsh-usage-plugin/issues/1)）。
 
-## 许可
+### 许可
 
 MIT © dsh-usage-plugin
