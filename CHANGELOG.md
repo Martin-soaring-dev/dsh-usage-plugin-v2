@@ -10,6 +10,8 @@
 
 ## Unreleased
 
+## v1.11.0 (2026-08-18)
+
 - **SiliconFlow 配置跟随**：余额查询只读取匹配的 `llm-pi-ai` 模型提供商配置（Provider ID / 显示名为 `siliconflow`）及其 `apiKeyEnv`；缺少提供商或 Key 时给出明确修复步骤，返回 0 时忠实展示公开 API 字段及定义。
 - **凭据安全**：SiliconFlow 推理 Key 仅会发送到官方 `api.siliconflow.cn` / `api.siliconflow.com`，不会发送到任意自定义网关。
 - **DigitalOcean 账单凭据**：余额页可输入并安全保存账户级 PAT，保存后只显示遮罩值；查询 Billing API 后只展示当前余额与本月至今使用，不请求账单明细。
