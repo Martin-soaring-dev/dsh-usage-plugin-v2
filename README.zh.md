@@ -4,7 +4,7 @@
 
 [English](./README.md) | **简体中文**
 
-[本项目](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [原项目](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
+[本项目](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [原项目](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/dsh-usage-plugin-v2) · MIT License
 
 **基于原项目复刻并继续增强的社区版本** —— 保留完整的用量与消耗统计能力，并补齐多服务商余额查询所需的凭据识别、字段解释和安全边界。
 
@@ -77,19 +77,19 @@
 
 > 以下内容复刻并延续原项目的核心介绍、安装方式与数据说明。为与本项目 v2 的实际行为一致，余额服务商、凭据规则和截图等内容已作适配。原始项目及其历史请参阅 [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin)。
 
-> ## 🔔 重要通知（2026-08-16）：npm 包名已更换
+> ## 🔔 重要说明：v2 使用独立 npm 包名
 >
-> 本插件的 **npm 包名已由 `@feiyang666/deepseekharnessdesktop` 更名为 `@feiyang666/dsh-usage-plugin`**（与 GitHub 仓库名 `feiyang-dev/dsh-usage-plugin` 保持一致）。
+> 本仓库是独立 fork，npm 包名为 **`dsh-usage-plugin-v2`**。上游包 `@feiyang666/dsh-usage-plugin` 仍归原项目所有和维护，本项目不会占用或冒用其 scope。
 >
-> - 安装 / 升级请使用新包名：`dsh plugin --profile web add @feiyang666/dsh-usage-plugin`
-> - 旧包名 `@feiyang666/deepseekharnessdesktop` 仍会保留一段时间，但**不再维护、不会更新**，请尽快迁移
-> - 桌面端（[`DeepSeek Harness 桌面版`](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)）已兼容两种包名，旧包名安装的会自动识别并支持「一键更新」迁移到新包名
+> - 安装或升级本 fork：`dsh plugin --profile web add dsh-usage-plugin-v2`
+> - 不要在同一个 DSH profile 中同时安装本 fork 与上游用量插件；两者提供相同功能入口，可能竞争相同的路由和面板。
+> - 如需迁移，请先从该 profile 移除上游包，再安装 `dsh-usage-plugin-v2`。
 
 ---
 
 ### 简介
 
-dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**（DSH plugin，Host + Client 双面一体包）。装好后在 WebUI 顶部「对话」「轨迹」之后会出现 **「用量与消耗」** 与 **「剩余余额查询」** 两个 tab：
+dsh-usage-plugin-v2 是 DeepSeek Harness 生态的**用量与消耗统计插件**（DSH plugin，Host + Client 双面一体包）。装好后在 WebUI 顶部「对话」「轨迹」之后会出现 **「用量与消耗」** 与 **「剩余余额查询」** 两个 tab：
 
 > 支持 **Windows / macOS / Linux**：路径按当前平台处理（`node:path`），目录选择与「打开所在目录」均调用系统原生方式（macOS 用 `osascript` / `open`，Linux 用 `zenity` / `xdg-open`），余额查询与导出不依赖 Windows 专用命令。
 
@@ -136,14 +136,14 @@ AMD GPU Cloud 会保留在服务商选择器中并明确说明支持状态，避
 
 ```bash
 # 前提：已安装 dsh（npm install -g @deepseek-ai/dsh）
-dsh plugin --profile web add @feiyang666/dsh-usage-plugin
+dsh plugin --profile web add dsh-usage-plugin-v2
 ```
 
 也可对其它 profile 安装：
 
 ```bash
-dsh plugin --profile web add @feiyang666/dsh-usage-plugin
-dsh plugin --profile headless add @feiyang666/dsh-usage-plugin
+dsh plugin --profile web add dsh-usage-plugin-v2
+dsh plugin --profile headless add dsh-usage-plugin-v2
 ```
 
 装完重启 dsh web 服务即可。详细的手动安装 / 接线 / 卸载 / 排障说明见下方。
@@ -176,7 +176,7 @@ dsh plugin --profile headless add @feiyang666/dsh-usage-plugin
 #### 1. 方法 A（推荐）：一条命令安装
 
 ```bash
-dsh plugin --profile web add @feiyang666/dsh-usage-plugin
+dsh plugin --profile web add dsh-usage-plugin-v2
 ```
 
 这条命令会做三件事（全部自动）：
@@ -187,7 +187,7 @@ dsh plugin --profile web add @feiyang666/dsh-usage-plugin
 
 其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
 
-> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.11.0.tgz`
+> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.11.0.tgz`
 
 #### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
 
@@ -197,7 +197,7 @@ dsh plugin --profile web add @feiyang666/dsh-usage-plugin
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add @feiyang666/dsh-usage-plugin
+pnpm add dsh-usage-plugin-v2
 # 然后手动把插件行加进 web/cordis.patch.yml（见 B3），再重启
 ```
 
@@ -207,7 +207,7 @@ pnpm add @feiyang666/dsh-usage-plugin
 cd ~/.dsh/profiles/web
 # 若该目录还没有 package.json（用 dsh plugin 初始化过才会有）：
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install @feiyang666/dsh-usage-plugin
+npm install dsh-usage-plugin-v2
 ```
 
 **B3. 接线（只需做一次，幂等）：** 在 `~/.dsh/profiles/web/cordis.patch.yml` 末尾追加：
@@ -215,7 +215,7 @@ npm install @feiyang666/dsh-usage-plugin
 ```yaml
 - insert:
     - id: usage-plugin
-      name: '@feiyang666/dsh-usage-plugin'
+      name: 'dsh-usage-plugin-v2'
       inject:
         - fs
         - webServer
@@ -229,7 +229,7 @@ npm install @feiyang666/dsh-usage-plugin
 也可以直接跑包内的接线脚本（自动找 profile 并追加，幂等）：
 
 ```bash
-node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
+node node_modules/dsh-usage-plugin-v2/scripts/wire.js
 ```
 
 > ⚠️ 行上的 `inject` 列表**不能省略**：它让 Cordis 等到 `fs` / `webServer` / `subprocess` / `credentials` / `settings` / `sandboxPolicy` / `agents` 服务就绪后再激活插件。缺了它，`/usage/api` 路由不会注册，面板会报 `Unexpected end of JSON input`。
@@ -264,7 +264,7 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 ### 卸载
 
 ```bash
-dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
+dsh plugin --profile web remove dsh-usage-plugin-v2
 ```
 
 （等价于 pnpm remove；`dsh plugin` 会自动把包名从 `dsh.profile.bundles` 层列表里移除。）然后重启应用即可。
@@ -340,4 +340,4 @@ pnpm dsh web
 
 ### 许可
 
-MIT © dsh-usage-plugin
+MIT © dsh-usage-plugin-v2

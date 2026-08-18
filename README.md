@@ -4,7 +4,7 @@
 
 **English** · [简体中文](./README.zh.md)
 
-[This project](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [Original project](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
+[This project](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [Original project](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/dsh-usage-plugin-v2) · MIT License
 
 **A reproduced and extended community edition of the original project** — preserving its complete usage and cost tracker while adding explicit credential handling, field definitions, and safety boundaries for multi-provider balance queries.
 
@@ -77,19 +77,19 @@ When no public endpoint exists, the plugin states the limitation and points user
 
 > The material below reproduces and preserves the original project's core introduction, installation guidance, and data documentation. Provider coverage, credential rules, and screenshots have been adapted to match this v2 implementation. For the source project and its history, see [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin).
 
-> ## 🔔 Important Notice (2026-08-16): npm package renamed
+> ## 🔔 Important: v2 uses an independent npm package name
 >
-> The **npm package has been renamed from `@feiyang666/deepseekharnessdesktop` to `@feiyang666/dsh-usage-plugin`** (matching the GitHub repo `feiyang-dev/dsh-usage-plugin`).
+> This repository is an independent fork and is published as **`dsh-usage-plugin-v2`**. The upstream package `@feiyang666/dsh-usage-plugin` remains owned and maintained by the original project.
 >
-> - Use the new package name for install / upgrade: `dsh plugin --profile web add @feiyang666/dsh-usage-plugin`
-> - The old package `@feiyang666/deepseekharnessdesktop` remains published for a while, but it is **no longer maintained and will not receive updates** — please migrate soon.
-> - The desktop client ([`DeepSeek Harness Desktop`](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)) supports both package names and will auto-detect old-name installs with a **one-click update** to the new name.
+> - Install or upgrade this fork with: `dsh plugin --profile web add dsh-usage-plugin-v2`
+> - Do not install this fork and the upstream usage plugin into the same DSH profile; both provide the same feature surface and may compete for the same routes and panels.
+> - To migrate, remove the upstream package from that profile first, then install `dsh-usage-plugin-v2`.
 
 ---
 
 ### Overview
 
-dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem (a DSH plugin shipped as a Host + Client two-in-one package). After installation, **"Usage & Cost"** and **"Balance Query"** tabs appear in the Web UI, right after "Conversation" and "Trace":
+dsh-usage-plugin-v2 is a **usage & cost tracker** plugin in the DeepSeek Harness ecosystem (a DSH plugin shipped as a Host + Client two-in-one package). After installation, **"Usage & Cost"** and **"Balance Query"** tabs appear in the Web UI, right after "Conversation" and "Trace":
 
 > Supports **Windows / macOS / Linux**: paths are handled per platform (`node:path`), and the folder picker / "reveal in file manager" use each OS's native mechanism (macOS: `osascript` / `open`; Linux: `zenity` / `xdg-open`). Balance query and export do not depend on Windows-only commands.
 
@@ -136,14 +136,14 @@ Install [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harne
 
 ```bash
 # Prerequisite: install dsh (npm install -g @deepseek-ai/dsh)
-dsh plugin --profile web add @feiyang666/dsh-usage-plugin
+dsh plugin --profile web add dsh-usage-plugin-v2
 ```
 
 Or install to another profile:
 
 ```bash
-dsh plugin --profile web add @feiyang666/dsh-usage-plugin
-dsh plugin --profile headless add @feiyang666/dsh-usage-plugin
+dsh plugin --profile web add dsh-usage-plugin-v2
+dsh plugin --profile headless add dsh-usage-plugin-v2
 ```
 
 Restart the dsh web service after installation. Detailed manual install / wiring / uninstall / troubleshooting follows below.
@@ -176,7 +176,7 @@ So for users, **installation is one command** — no YAML editing, no manual fil
 #### 1. Method A (recommended): one command
 
 ```bash
-dsh plugin --profile web add @feiyang666/dsh-usage-plugin
+dsh plugin --profile web add dsh-usage-plugin-v2
 ```
 
 This does three things (all automatic):
@@ -187,7 +187,7 @@ This does three things (all automatic):
 
 Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.11.0.tgz`
+> Test a local tarball: `dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.11.0.tgz`
 
 #### 2. Method B: manual install (no pnpm / no `dsh plugin`)
 
@@ -197,7 +197,7 @@ Only for when you have no pnpm or want full manual control. **Do not `npm instal
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add @feiyang666/dsh-usage-plugin
+pnpm add dsh-usage-plugin-v2
 # then manually append the plugin row to web/cordis.patch.yml (see B3) and restart
 ```
 
@@ -207,7 +207,7 @@ pnpm add @feiyang666/dsh-usage-plugin
 cd ~/.dsh/profiles/web
 # if no package.json exists there yet (only after `dsh plugin` init):
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install @feiyang666/dsh-usage-plugin
+npm install dsh-usage-plugin-v2
 ```
 
 **B3. Wire it up (once, idempotent):** append to `~/.dsh/profiles/web/cordis.patch.yml`:
@@ -215,7 +215,7 @@ npm install @feiyang666/dsh-usage-plugin
 ```yaml
 - insert:
     - id: usage-plugin
-      name: '@feiyang666/dsh-usage-plugin'
+      name: 'dsh-usage-plugin-v2'
       inject:
         - fs
         - webServer
@@ -229,7 +229,7 @@ npm install @feiyang666/dsh-usage-plugin
 Or just run the package's built-in wiring script (auto-finds the profile and appends, idempotent):
 
 ```bash
-node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
+node node_modules/dsh-usage-plugin-v2/scripts/wire.js
 ```
 
 > ⚠️ The `inject` list is **required**: it makes Cordis wait until `fs` / `webServer` / `subprocess` / `credentials` / `settings` / `sandboxPolicy` / `agents` are ready before activating the plugin. Without it the `/usage/api` route never registers and the panel fails with `Unexpected end of JSON input`.
@@ -264,7 +264,7 @@ Open the **Balance Query** tab and select a provider. Requests run on the host s
 ### Uninstall
 
 ```bash
-dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
+dsh plugin --profile web remove dsh-usage-plugin-v2
 ```
 
 (Equivalent to pnpm remove; `dsh plugin` auto-removes the package name from the `dsh.profile.bundles` layer list.) Restart the app afterward.
@@ -340,4 +340,4 @@ pnpm dsh web
 
 ### License
 
-MIT © dsh-usage-plugin
+MIT © dsh-usage-plugin-v2

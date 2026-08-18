@@ -1,7 +1,7 @@
 {
-  "name": "@feiyang666/dsh-usage-plugin",
+  "name": "dsh-usage-plugin-v2",
   "version": "1.11.0",
-  "description": "DeepSeek Harness usage & cost tracker plugin: per-call token/cache-hit stats, peak/off-peak billing, multi-provider balance queries, CSV/JSON/PNG export with custom destination, and persistent local storage. Ships a host half plus a web client half in one npm package; installs into a DSH profile as a dsh.bundle with one command (dsh plugin --profile web add @feiyang666/dsh-usage-plugin).",
+  "description": "Independent v2 fork of the DeepSeek Harness usage & cost tracker plugin: per-call token/cache-hit stats, peak/off-peak billing, multi-provider balance queries, CSV/JSON/PNG export, and persistent local storage. Installs with dsh plugin --profile web add dsh-usage-plugin-v2.",
   "keywords": [
     "deepseek",
     "harness",
@@ -18,17 +18,22 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/feiyang-dev/dsh-usage-plugin.git"
+    "url": "git+https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2.git"
   },
+  "author": "Martin-soaring-dev",
   "contributors": [
+    {
+      "name": "feiyang-dev (original project)",
+      "url": "https://github.com/feiyang-dev/dsh-usage-plugin"
+    },
     {
       "name": "liu3734",
       "url": "https://github.com/liu3734"
     }
   ],
-  "homepage": "https://github.com/feiyang-dev/dsh-usage-plugin#readme",
+  "homepage": "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2#readme",
   "bugs": {
-    "url": "https://github.com/feiyang-dev/dsh-usage-plugin/issues"
+    "url": "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/issues"
   },
   "exports": {
     ".": "./lib/index.js",
