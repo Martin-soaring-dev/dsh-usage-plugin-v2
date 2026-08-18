@@ -26,6 +26,10 @@ Those providers do not share one credential or billing model: some expose balanc
 
 This project does not impersonate or replace the original. Credit for the original design, code, and contributions remains with its authors and contributors under the MIT License.
 
+### AI Assistance and Maintenance Disclosure
+
+This is a human–AI collaborative project. Its development, testing, debugging, documentation, release preparation, and ongoing maintenance are carried out by the project maintainer with assistance from **OpenAI Codex (ChatGPT)**. Codex has contributed to requirements analysis, code investigation and implementation, verification, troubleshooting, and documentation. The maintainer defines the goals, authorizes account- and credential-related actions, reviews the results, and remains responsible for merges, releases, and the project's final behavior. The Git history is the authoritative record of individual changes.
+
 ### What This Fork Adds
 
 - Extends the balance page to **DeepSeek, SiliconFlow, DigitalOcean, and AMD GPU Cloud**, while retaining the original usage, cost, calendar, cache, pricing, import/export, and persistence features.
