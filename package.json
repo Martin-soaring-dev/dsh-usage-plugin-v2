@@ -1,6 +1,6 @@
 {
   "name": "dsh-usage-plugin-v2",
-  "version": "1.12.2",
+  "version": "1.13.0",
   "description": "Independent v2 fork of the DeepSeek Harness usage & cost tracker plugin, distributed and updated through GitHub Releases.",
   "keywords": [
     "deepseek",
