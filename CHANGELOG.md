@@ -8,7 +8,7 @@
 
 ---
 
-## Unreleased
+## v1.10.0 (2026-08-17)
 
 - **多服务商余额查询**：新增 SiliconFlow `GET /v1/user/info`，展示免费额度、充值额度与总额度。
 - **DigitalOcean 账户余额**：新增账户级 Billing API `GET /v2/customers/my/balance`，读取 `DIGITALOCEAN_TOKEN` / `DIGITALOCEAN_ACCESS_TOKEN`；明确区分账户 PAT 与 DO AI 推理 Key。
