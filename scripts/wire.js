@@ -4,7 +4,7 @@
  * PREFERRED INSTALL: this package declares `dsh.bundle`, so it auto-activates
  * with a single command and NO manual wiring:
  *
- *   dsh plugin --profile web add dsh-usage-plugin-v2
+ *   dsh plugin --profile web add <github-release-tarball-url>
  *
  * This script exists only for the manual fallback path (installing the package
  * by hand into a profile's node_modules): it appends the plugin row to the
@@ -73,7 +73,7 @@ function wire(patchPath) {
     return true;
   }
   const block =
-    "\n# " + PACKAGE_NAME + ": usage & cost tracking (installed via npm).\n" +
+    "\n# " + PACKAGE_NAME + ": usage & cost tracking (installed from GitHub Releases).\n" +
     "- insert:\n" +
     "    - id: " + ROW_ID + "\n" +
     "      name: '" + PACKAGE_NAME + "'\n" +

@@ -4,7 +4,7 @@
 
 **English** · [简体中文](./README.zh.md)
 
-[This project](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [Original project](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/dsh-usage-plugin-v2) · MIT License
+[This project](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [Latest Release](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/releases/latest) · [Original project](https://github.com/feiyang-dev/dsh-usage-plugin) · MIT License
 
 **A reproduced and extended community edition of the original project** — preserving its complete usage and cost tracker while adding explicit credential handling, field definitions, and safety boundaries for multi-provider balance queries.
 
@@ -50,6 +50,7 @@ This is a human–AI collaborative project. Its development, testing, debugging,
 | Response semantics | Presents DeepSeek balance fields | Defines SiliconFlow fields and explains DigitalOcean account balance, available credit, and month-to-date usage |
 | Unsupported APIs | No multi-provider support-status model | Never calls an undocumented AMD balance endpoint and explains the limitation in the UI |
 | Security and verification | Retains the original Host + Client plugin architecture | Host-side balance calls, masked token storage, official-host restrictions for SiliconFlow, and provider contract tests |
+| Distribution and updates | The original project is distributed through npm | This project uses GitHub Releases only, with manual check-and-install in Settings |
 
 ### New Balance Query Screenshots
 
@@ -77,13 +78,14 @@ When no public endpoint exists, the plugin states the limitation and points user
 
 > The material below reproduces and preserves the original project's core introduction, installation guidance, and data documentation. Provider coverage, credential rules, and screenshots have been adapted to match this v2 implementation. For the source project and its history, see [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin).
 
-> ## 🔔 Important: v2 uses an independent npm package name
+> ## 🔔 Important: v2 is distributed only through GitHub Releases
 >
-> This repository is an independent fork and is published as **`dsh-usage-plugin-v2`**. The upstream package `@feiyang666/dsh-usage-plugin` remains owned and maintained by the original project.
+> This repository is an independent fork. It does not publish an npm package or use the upstream `@feiyang666` scope. Installations and updates come only from this repository's stable GitHub Releases.
 >
-> - Install or upgrade this fork with: `dsh plugin --profile web add dsh-usage-plugin-v2`
+> - Install this fork with: `dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"`
+> - Update it from Harness Settings → Plugin Update → Check for Updates, then restart the service completely.
 > - Do not install this fork and the upstream usage plugin into the same DSH profile; both provide the same feature surface and may compete for the same routes and panels.
-> - To migrate, remove the upstream package from that profile first, then install `dsh-usage-plugin-v2`.
+> - To migrate, remove the upstream package from that profile first, then install this fork.
 
 ---
 
@@ -126,24 +128,18 @@ The AMD entry is intentionally visible in the selector so users get a clear supp
 
 ### Recommended Installation
 
-> Either method works and is equivalent. **We recommend the desktop app** — fully graphical, no command line needed.
-
-#### Option 1 (recommended): One-click via the desktop app
-
-Install [DeepSeek Harness Desktop](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop), open it, then go to **"Install Plugins" → Recommended → Usage & Cost Tracker → Install** and click **"Restart Service Now"** to activate.
-
-#### Option 2: Command line
+Use the GitHub Release command for the first installation:
 
 ```bash
 # Prerequisite: install dsh (npm install -g @deepseek-ai/dsh)
-dsh plugin --profile web add dsh-usage-plugin-v2
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 Or install to another profile:
 
 ```bash
-dsh plugin --profile web add dsh-usage-plugin-v2
-dsh plugin --profile headless add dsh-usage-plugin-v2
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 Restart the dsh web service after installation. Detailed manual install / wiring / uninstall / troubleshooting follows below.
@@ -152,7 +148,7 @@ Restart the dsh web service after installation. Detailed manual install / wiring
 
 ### What's in the package
 
-One npm package = a **host half** (Node-side Cordis plugin: recording, billing, balance query, export — see `lib/index.js`) + a **client half** (browser-side panel — see `lib/client.js`, which talks to the host via `/usage/api`).
+One GitHub Release package = a **host half** (Node-side Cordis plugin: recording, billing, balance query, export, and updates — see `lib/index.js`) + a **client half** (browser-side panel — see `lib/client.js`, which talks to the host via `/usage/api`).
 
 The package integrates with DSH through two declarations:
 
@@ -176,7 +172,7 @@ So for users, **installation is one command** — no YAML editing, no manual fil
 #### 1. Method A (recommended): one command
 
 ```bash
-dsh plugin --profile web add dsh-usage-plugin-v2
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 This does three things (all automatic):
@@ -187,7 +183,7 @@ This does three things (all automatic):
 
 Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> Test a local tarball: `dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.11.0.tgz`
+> Test a local tarball: `dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.12.0.tgz`
 
 #### 2. Method B: manual install (no pnpm / no `dsh plugin`)
 
@@ -197,17 +193,17 @@ Only for when you have no pnpm or want full manual control. **Do not `npm instal
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add dsh-usage-plugin-v2
+pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 # then manually append the plugin row to web/cordis.patch.yml (see B3) and restart
 ```
 
-**B2. Or use npm:** add a minimal package.json to the profile first, then install:
+**B2. Or use the npm client with the GitHub archive:** add a minimal package.json first (the plugin is not downloaded from the npm Registry):
 
 ```bash
 cd ~/.dsh/profiles/web
 # if no package.json exists there yet (only after `dsh plugin` init):
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install dsh-usage-plugin-v2
+npm install "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 **B3. Wire it up (once, idempotent):** append to `~/.dsh/profiles/web/cordis.patch.yml`:
@@ -297,7 +293,7 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 | AMD GPU Cloud says balance query is unsupported | This is expected: no public balance endpoint is currently documented for its inference key; view the balance in the provider console |
 | Balance query network error | Ensure the selected provider's API host is reachable (`api.deepseek.com`, `api.siliconflow.cn`, or `api.digitalocean.com`); configure a proxy if needed |
 | `dsh plugin` reports pnpm not found | Install pnpm: `npm install -g pnpm` |
-| Install can't reach the npm registry | Set a mirror: `npm config set registry https://registry.npmmirror.com` (or `pnpm config set registry ...`) and retry |
+| Update check or installation cannot connect | Confirm that `api.github.com` and `github.com` are reachable; this plugin updates only from this repository's stable Releases |
 | After uninstall, still reports `Cannot find package '@feiyang666/...'` | A package reference remains in the profile. Remove the corresponding row from `cordis.patch.yml` and the package name from `dsh.profile.bundles`, then restart |
 
 ---

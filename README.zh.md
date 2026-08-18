@@ -4,7 +4,7 @@
 
 [English](./README.md) | **简体中文**
 
-[本项目](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [原项目](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/dsh-usage-plugin-v2) · MIT License
+[本项目](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2) · [最新 Release](https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/releases/latest) · [原项目](https://github.com/feiyang-dev/dsh-usage-plugin) · MIT License
 
 **基于原项目复刻并继续增强的社区版本** —— 保留完整的用量与消耗统计能力，并补齐多服务商余额查询所需的凭据识别、字段解释和安全边界。
 
@@ -50,6 +50,7 @@
 | 返回值说明 | 展示 DeepSeek 余额字段 | 补充 SiliconFlow 字段定义、DigitalOcean 账户余额/信用余额语义与本月至今使用 |
 | 不支持的接口 | 未形成多服务商状态说明 | 不请求未经官方文档确认的 AMD 余额端点，并在界面解释原因 |
 | 安全与验证 | 沿用原项目的 Host + Client 插件结构 | 余额调用留在 Host 侧、Token 隐藏保存、限制 SiliconFlow 官方主机，并增加服务商契约测试 |
+| 发行与更新 | 原项目通过 npm 分发 | 本项目只使用 GitHub Releases；设置页可手动检查并安装新版本 |
 
 ### 新增余额查询截图
 
@@ -77,13 +78,14 @@
 
 > 以下内容复刻并延续原项目的核心介绍、安装方式与数据说明。为与本项目 v2 的实际行为一致，余额服务商、凭据规则和截图等内容已作适配。原始项目及其历史请参阅 [feiyang-dev/dsh-usage-plugin](https://github.com/feiyang-dev/dsh-usage-plugin)。
 
-> ## 🔔 重要说明：v2 使用独立 npm 包名
+> ## 🔔 重要说明：v2 仅通过 GitHub Releases 发行
 >
-> 本仓库是独立 fork，npm 包名为 **`dsh-usage-plugin-v2`**。上游包 `@feiyang666/dsh-usage-plugin` 仍归原项目所有和维护，本项目不会占用或冒用其 scope。
+> 本仓库是独立 fork，不发布 npm 包，也不会占用或冒用上游 `@feiyang666` scope。安装包与更新均来自本仓库的正式 GitHub Release。
 >
-> - 安装或升级本 fork：`dsh plugin --profile web add dsh-usage-plugin-v2`
+> - 安装本 fork：`dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"`
+> - 更新本 fork：打开 Harness 设置中的“插件更新”，点击“检查更新”；发现新版本后点击安装并完全重启服务。
 > - 不要在同一个 DSH profile 中同时安装本 fork 与上游用量插件；两者提供相同功能入口，可能竞争相同的路由和面板。
-> - 如需迁移，请先从该 profile 移除上游包，再安装 `dsh-usage-plugin-v2`。
+> - 如需迁移，请先从该 profile 移除上游包，再安装本 fork。
 
 ---
 
@@ -126,24 +128,18 @@ AMD GPU Cloud 会保留在服务商选择器中并明确说明支持状态，避
 
 ### 推荐安装方式
 
-> 两个方法任选其一，效果等价。**推荐使用桌面端**，全程图形化、无需命令行。
-
-#### 方式一（推荐）：桌面端一键安装
-
-安装 [DeepSeek Harness 桌面版](https://github.com/feiyang-dev/DeepSeek-Harness-Desktop)，打开后点击 **「安装插件」→ 推荐插件 → 用量与消耗插件 → 一键安装**，完成后点 **「立即重启服务」** 即可生效。
-
-#### 方式二：命令行安装
+首次安装使用 GitHub Release 命令：
 
 ```bash
 # 前提：已安装 dsh（npm install -g @deepseek-ai/dsh）
-dsh plugin --profile web add dsh-usage-plugin-v2
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 也可对其它 profile 安装：
 
 ```bash
-dsh plugin --profile web add dsh-usage-plugin-v2
-dsh plugin --profile headless add dsh-usage-plugin-v2
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 装完重启 dsh web 服务即可。详细的手动安装 / 接线 / 卸载 / 排障说明见下方。
@@ -152,7 +148,7 @@ dsh plugin --profile headless add dsh-usage-plugin-v2
 
 ### 这个包是什么
 
-一个 npm 包 = **host 半**（Node 侧 Cordis 插件，负责记录、计费、余额查询、导出，见 `lib/index.js`）+ **client 半**（浏览器侧面板，见 `lib/client.js`，通过 `/usage/api` 与 host 通信）。
+一个 GitHub Release 安装包 = **host 半**（Node 侧 Cordis 插件，负责记录、计费、余额查询、导出与更新，见 `lib/index.js`）+ **client 半**（浏览器侧面板，见 `lib/client.js`，通过 `/usage/api` 与 host 通信）。
 
 包通过两处声明接入 DSH：
 
@@ -176,7 +172,7 @@ dsh plugin --profile headless add dsh-usage-plugin-v2
 #### 1. 方法 A（推荐）：一条命令安装
 
 ```bash
-dsh plugin --profile web add dsh-usage-plugin-v2
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 这条命令会做三件事（全部自动）：
@@ -187,7 +183,7 @@ dsh plugin --profile web add dsh-usage-plugin-v2
 
 其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
 
-> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.11.0.tgz`
+> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.12.0.tgz`
 
 #### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
 
@@ -197,17 +193,17 @@ dsh plugin --profile web add dsh-usage-plugin-v2
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add dsh-usage-plugin-v2
+pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 # 然后手动把插件行加进 web/cordis.patch.yml（见 B3），再重启
 ```
 
-**B2. 或用 npm：** 在 profile 目录先补一个最小 package.json 再装：
+**B2. 或用 npm 客户端安装 GitHub 压缩包：** 在 profile 目录先补一个最小 package.json 再装（这不会从 npm Registry 下载本插件）：
 
 ```bash
 cd ~/.dsh/profiles/web
 # 若该目录还没有 package.json（用 dsh plugin 初始化过才会有）：
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install dsh-usage-plugin-v2
+npm install "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
 ```
 
 **B3. 接线（只需做一次，幂等）：** 在 `~/.dsh/profiles/web/cordis.patch.yml` 末尾追加：
@@ -297,7 +293,7 @@ dsh plugin --profile web remove dsh-usage-plugin-v2
 | AMD GPU Cloud 提示暂不支持余额查询 | 这是预期行为：当前没有为推理 Key 公开文档化的余额端点，请在服务商控制台查看 |
 | 余额查询失败网络错误 | 确认所选服务商的 API 域名可访问（`api.deepseek.com`、`api.siliconflow.cn` 或 `api.digitalocean.com`），必要时配置代理 |
 | `dsh plugin` 报 pnpm not found | 安装 pnpm：`npm install -g pnpm` |
-| 安装时连不上 npm 官方源 | 配置镜像：`npm config set registry https://registry.npmmirror.com`（或对 pnpm 设 `pnpm config set registry ...`）后再执行安装命令 |
+| 检查或安装更新时无法连接 | 确认网络可以访问 `api.github.com` 与 `github.com`；插件只从本仓库正式 Release 更新 |
 | 卸载后仍报 `Cannot find package '@feiyang666/...'` | profile 里残留了包引用。删掉 `cordis.patch.yml` 中对应行与 `dsh.profile.bundles` 里的包名，重启 |
 
 ---

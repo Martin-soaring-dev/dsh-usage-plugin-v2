@@ -1,8 +1,7 @@
 /**
- * dsh-usage-plugin — pre-publish sanity gate (dependency-free).
+ * dsh-usage-plugin — release sanity gate (dependency-free).
  *
- * Run by `npm run check` and `npm run prepublishOnly` before the package is
- * packed/uploaded. It verifies every piece of the DSH plugin contract that
+ * Run before creating a GitHub Release. It verifies every piece of the DSH plugin contract that
  * would otherwise fail LOUDLY at boot or client-load time when missing:
  *
  *   1. `dsh.bundle.patch` — the profile bundle patch file exists and carries a

@@ -1,8 +1,8 @@
 # dsh-usage-plugin — bundle patch layer.
 #
 # This file is the package's `dsh.bundle.patch` layer. When the package is
-# installed into a DSH profile (via `dsh plugin --profile <name> add
-# dsh-usage-plugin-v2`, or manually), the loader applies this
+# installed into a DSH profile from a GitHub Release (via `dsh plugin
+# --profile <name> add <release-tarball-url>`, or manually), the loader applies this
 # patch over the profile's empty root entry list, mounting the plugin row.
 #
 # The `inject` list is REQUIRED: it tells the Cordis loader to wait until the

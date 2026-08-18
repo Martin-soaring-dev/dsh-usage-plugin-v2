@@ -1,7 +1,7 @@
 {
   "name": "dsh-usage-plugin-v2",
-  "version": "1.11.0",
-  "description": "Independent v2 fork of the DeepSeek Harness usage & cost tracker plugin: per-call token/cache-hit stats, peak/off-peak billing, multi-provider balance queries, CSV/JSON/PNG export, and persistent local storage. Installs with dsh plugin --profile web add dsh-usage-plugin-v2.",
+  "version": "1.12.0",
+  "description": "Independent v2 fork of the DeepSeek Harness usage & cost tracker plugin, distributed and updated through GitHub Releases.",
   "keywords": [
     "deepseek",
     "harness",
@@ -65,9 +65,7 @@
   "scripts": {
     "wire": "node scripts/wire.js",
     "check": "node scripts/check-package.js && node --test",
-    "test": "node --test",
-    "prepublishOnly": "node scripts/check-package.js",
-    "pack": "npm pack"
+    "test": "node --test"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1"
