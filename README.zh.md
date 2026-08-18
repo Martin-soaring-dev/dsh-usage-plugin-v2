@@ -36,7 +36,7 @@ dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**�
 - **用量日历**：按月查看每日用量热力图（按消耗或调用数着色），悬停查看详情（含高峰 / 空闲消耗拆分）、点击某天查看当日调用明细与高峰/空闲消耗统计，附本月每日统计表（高峰消耗 / 空闲消耗 / 总消耗分列）与月度汇总。
 - **缓存命中列表**：最新记录排在最前，支持 今天 / 近7天 / 近30天 / 全部 快捷筛选与自定义起止日期区间，汇总行与表尾合计区分高峰消耗 / 空闲消耗 / 总费用合计；列表分页渲染（每页 100 条），记录量大也不卡顿。
 - **价格表**：**DeepSeek 官方 API 价格表**，展示基础价与峰谷价（高峰/空闲）单价表，高峰价与空闲价分列展示，支持在面板内直接编辑价格并持久化（数据目录 `pricing.json`），也可一键恢复默认。
-- **剩余余额查询**：用当前配置的 `DEEPSEEK_API_KEY` 查询 DeepSeek 账户余额。
+- **剩余余额查询**：DeepSeek 与 SiliconFlow 可直接使用推理 Key 查询；DigitalOcean 使用账户级 Billing API。AMD GPU Cloud 因未公开推理 Key 可调用的余额端点，面板会明确显示“暂不支持”，不会猜测或调用未经确认的接口。
 - **导出**：CSV / JSON / **PNG 长图**（按最新在前展示，最多含最近 2000 条，超出会提示；PNG 报告含高峰 / 空闲消耗分列统计），可导出到任意目录（原生目录选择器），导出后自动打开所在目录。
 - **导入**：选择文件（JSON / CSV）合并导入，按时间去重。
 - **持久化**：记录实时落盘到 `<会话工作区>/dsh-usage/usage-records.json`，重启自动恢复（上限 100000 条，尽量多存）。
@@ -175,7 +175,16 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 
 ### 5. 配置（余额查询需要）
 
-「剩余余额查询」使用当前配置的 `DEEPSEEK_API_KEY`：在 **设置 → 模型** 中配置 API Key（与跑对话用的同一个 key），然后打开「剩余余额查询」tab 点「查询余额」。
+余额面板按服务商读取不同凭据：
+
+| 服务商 | 凭据 | 查询来源 |
+| --- | --- | --- |
+| DeepSeek | `DEEPSEEK_API_KEY` | `GET https://api.deepseek.com/user/balance` |
+| SiliconFlow | `SILICONFLOW_API_KEY` | `GET https://api.siliconflow.cn/v1/user/info` |
+| DigitalOcean | `DIGITALOCEAN_TOKEN`（也兼容 `DIGITALOCEAN_ACCESS_TOKEN`） | 账户级 `GET /v2/customers/my/balance`；DO AI 推理 Key 不可用于此查询 |
+| AMD GPU Cloud | — | 推理 Key 暂无公开余额端点，请在服务商控制台查看 |
+
+配置相应凭据后，打开「剩余余额查询」tab、选择服务商并点击「查询余额」。DigitalOcean 需要另行配置具有账单读取权限的账户级 Personal Access Token；插件不会把推理 Key 误当作账单凭据。
 
 ---
 

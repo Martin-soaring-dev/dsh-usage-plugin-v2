@@ -36,7 +36,7 @@ dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ec
 - **Usage Calendar**: a monthly daily-usage heatmap (colored by cost or call count), hover for details including the peak/off-peak cost split, click a day for its call list and peak/off-peak totals, plus a per-day statistics table with peak cost / off-peak cost / total columns and monthly rollups.
 - **Cache Hit List**: newest-first, fully scrollable, with quick filters (Today / 7 days / 30 days / All) and custom date ranges; the summary line and footer total split peak vs off-peak consumption with a grand cost total. The list is paginated (100 rows per page), so it stays smooth even with large data volumes.
 - **Price Table**: the official DeepSeek API price table — base and peak/valley unit prices shown side by side (peak vs off-peak), editable in-panel and persisted to `pricing.json`, with a reset-to-default option.
-- **Balance Query**: queries your DeepSeek account balance using the configured `DEEPSEEK_API_KEY`.
+- **Balance Query**: queries DeepSeek and SiliconFlow directly with their inference keys, and DigitalOcean through its account-level Billing API. AMD GPU Cloud is shown with an explicit unsupported status because it does not currently publish a balance endpoint for its inference key.
 - **Export**: CSV / JSON / **PNG long image** (newest-first, up to the latest 2000 records, warns if exceeded; the PNG report includes peak/off-peak cost columns), to any directory (native picker), auto-opens the folder after export.
 - **Import**: merge-imports JSON / CSV files, deduplicated by time.
 - **Persistence**: records are written live to `<session workspace>/dsh-usage/usage-records.json` and restored on restart (cap 100000 records).
@@ -175,7 +175,16 @@ Restart the DeepSeek Harness web app (command line: kill the old process and re-
 
 ### 5. Configuration (for balance query)
 
-"Balance Query" uses the configured `DEEPSEEK_API_KEY`: set the API Key in **Settings → Models** (same key used for chats), then open the "Balance Query" tab and click "Query Balance".
+The balance panel selects credentials by provider:
+
+| Provider | Credential | Query source |
+| --- | --- | --- |
+| DeepSeek | `DEEPSEEK_API_KEY` | `GET https://api.deepseek.com/user/balance` |
+| SiliconFlow | `SILICONFLOW_API_KEY` | `GET https://api.siliconflow.cn/v1/user/info` |
+| DigitalOcean | `DIGITALOCEAN_TOKEN` (or `DIGITALOCEAN_ACCESS_TOKEN`) | Account-level `GET /v2/customers/my/balance`; a DO AI inference key is not sufficient |
+| AMD GPU Cloud | — | No documented balance endpoint for its inference key; use the provider console |
+
+Configure the applicable credential, open the **Balance Query** tab, select the provider, and click **Query Balance**. DigitalOcean requires a separate account-level Personal Access Token with billing read access; the plugin does not reuse or reinterpret an inference key as a billing credential.
 
 ---
 

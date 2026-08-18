@@ -59,7 +59,8 @@
   ],
   "scripts": {
     "wire": "node scripts/wire.js",
-    "check": "node scripts/check-package.js",
+    "check": "node scripts/check-package.js && node --test",
+    "test": "node --test",
     "prepublishOnly": "node scripts/check-package.js",
     "pack": "npm pack"
   },
