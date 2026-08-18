@@ -43,3 +43,16 @@ test('finds the DSH profile above the outer node_modules directory', () => {
     path.join(path.parse(process.cwd()).root, 'users', 'martin', '.dsh', 'profiles', 'web')
   )
 })
+
+test('finds the Harness profile above a plugins directory', () => {
+  const modulePath = path.join(path.parse(process.cwd()).root, 'users', 'martin', '.dsh', 'profiles', 'web', 'plugins', 'dsh-usage-plugin-v2', 'lib', 'updater.js')
+  assert.equal(
+    profileRootFromModule(pathToFileURL(modulePath).href),
+    path.join(path.parse(process.cwd()).root, 'users', 'martin', '.dsh', 'profiles', 'web')
+  )
+})
+
+test('returns empty when no known profile marker exists', () => {
+  const modulePath = path.join(path.parse(process.cwd()).root, 'tmp', 'dsh-usage-plugin-v2', 'lib', 'updater.js')
+  assert.equal(profileRootFromModule(pathToFileURL(modulePath).href), '')
+})
