@@ -36,7 +36,7 @@ dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**�
 - **用量日历**：按月查看每日用量热力图（按消耗或调用数着色），悬停查看详情（含高峰 / 空闲消耗拆分）、点击某天查看当日调用明细与高峰/空闲消耗统计，附本月每日统计表（高峰消耗 / 空闲消耗 / 总消耗分列）与月度汇总。
 - **缓存命中列表**：最新记录排在最前，支持 今天 / 近7天 / 近30天 / 全部 快捷筛选与自定义起止日期区间，汇总行与表尾合计区分高峰消耗 / 空闲消耗 / 总费用合计；列表分页渲染（每页 100 条），记录量大也不卡顿。
 - **价格表**：**DeepSeek 官方 API 价格表**，展示基础价与峰谷价（高峰/空闲）单价表，高峰价与空闲价分列展示，支持在面板内直接编辑价格并持久化（数据目录 `pricing.json`），也可一键恢复默认。
-- **剩余余额查询**：DeepSeek 与 SiliconFlow 可直接使用推理 Key 查询；DigitalOcean 使用账户级 Billing API。AMD GPU Cloud 因未公开推理 Key 可调用的余额端点，面板会明确显示“暂不支持”，不会猜测或调用未经确认的接口。
+- **剩余余额查询**：DeepSeek 与 SiliconFlow 可直接使用推理 Key 查询；SiliconFlow 会跟随匹配的自定义模型提供商 `apiKeyEnv` 与官方 `.cn` / `.com` 地址；DigitalOcean 使用账户级 Billing API。AMD GPU Cloud 因未公开推理 Key 可调用的余额端点，面板会显示“仅支持控制台查看”，不会猜测或调用未经确认的接口。
 - **导出**：CSV / JSON / **PNG 长图**（按最新在前展示，最多含最近 2000 条，超出会提示；PNG 报告含高峰 / 空闲消耗分列统计），可导出到任意目录（原生目录选择器），导出后自动打开所在目录。
 - **导入**：选择文件（JSON / CSV）合并导入，按时间去重。
 - **持久化**：记录实时落盘到 `<会话工作区>/dsh-usage/usage-records.json`，重启自动恢复（上限 100000 条，尽量多存）。
@@ -47,9 +47,9 @@ dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**�
 | 服务商 | 状态 | 凭据 | 展示内容 |
 | --- | --- | --- | --- |
 | DeepSeek | ✅ API 查询 | `DEEPSEEK_API_KEY` | 总余额、充值余额、赠送余额 |
-| SiliconFlow | ✅ API 查询 | `SILICONFLOW_API_KEY` | 总额度、充值额度、免费额度 |
-| DigitalOcean | ✅ 账户级 Billing API | `DIGITALOCEAN_TOKEN` 或 `DIGITALOCEAN_ACCESS_TOKEN` | 账户余额、本月至今用量与余额（USD） |
-| AMD GPU Cloud | ℹ️ 仅控制台查看 | — | 当前没有为推理 Key 公开文档化的余额端点 |
+| SiliconFlow | ✅ API 查询 | Provider ID 或显示名为 `siliconflow` 的模型提供商所引用的 `apiKeyEnv` | 公开 API 的总余额、充值余额与旧版赠送余额字段 |
+| DigitalOcean | ✅ 账户级 Billing API | 在余额页输入账户 PAT，以 `DIGITALOCEAN_TOKEN` 安全保存（[创建 Token](https://cloud.digitalocean.com/account/api/tokens)） | 当前账户余额与本月至今使用（USD），不查账单明细 |
+| AMD GPU Cloud | ℹ️ 仅控制台查看 | — | 前往 [AMD Developer Cloud](https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html) 查看 credits；当前没有为推理 Key 公开文档化的余额端点 |
 
 AMD GPU Cloud 会保留在服务商选择器中并明确说明支持状态，避免向猜测的端点发起无效请求。
 
@@ -160,6 +160,7 @@ npm install @feiyang666/dsh-usage-plugin
         - webServer
         - subprocess
         - credentials
+        - settings
         - sandboxPolicy
         - agents
 ```
@@ -170,7 +171,7 @@ npm install @feiyang666/dsh-usage-plugin
 node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 ```
 
-> ⚠️ 行上的 `inject` 列表**不能省略**：它让 Cordis 等到 `fs` / `webServer` / `subprocess` / `credentials` / `sandboxPolicy` / `agents` 服务就绪后再激活插件。缺了它，`/usage/api` 路由不会注册，面板会报 `Unexpected end of JSON input`。
+> ⚠️ 行上的 `inject` 列表**不能省略**：它让 Cordis 等到 `fs` / `webServer` / `subprocess` / `credentials` / `settings` / `sandboxPolicy` / `agents` 服务就绪后再激活插件。缺了它，`/usage/api` 路由不会注册，面板会报 `Unexpected end of JSON input`。
 
 ### 3. 方法 C：桌面应用
 
@@ -191,11 +192,11 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 | 服务商 | 查询来源 | 重要说明 |
 | --- | --- | --- |
 | DeepSeek | `GET https://api.deepseek.com/user/balance` | 使用配置 DeepSeek 模型时的同一个推理 Key |
-| SiliconFlow | `GET https://api.siliconflow.cn/v1/user/info` | 使用 SiliconFlow 推理 Key |
-| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | 必须使用账户级 Personal Access Token；DO AI 推理 Key 不可用于此查询 |
-| AMD GPU Cloud | 服务商控制台 | 选择后只返回明确的“暂不支持”说明，不会发送余额请求 |
+| SiliconFlow | 在匹配的官方 `.cn` / `.com` API 主机调用 `GET /v1/user/info` | 必须有 Provider ID 或显示名为 `siliconflow` 的模型提供商；只读取该提供商的 `apiKeyEnv`，不回退到独立环境变量 |
+| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | 在余额页输入带 `billing:read` 的[账户级 Personal Access Token](https://cloud.digitalocean.com/account/api/tokens)；由 DSH 凭据服务保存，保存后只显示遮罩值 |
+| AMD GPU Cloud | [AMD Developer Cloud](https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html) | 选择后显示“仅支持控制台查看”，不会发送余额请求 |
 
-打开「剩余余额查询」tab、选择服务商并点击「查询余额」。请求在 Host 侧执行，凭据值不会返回给浏览器 UI。DigitalOcean 需要另行配置具有账单读取权限的账户级 Personal Access Token；插件不会把推理 Key 误当作账单凭据。
+打开「剩余余额查询」tab 并选择服务商。请求在 Host 侧执行，凭据明文不会返回给浏览器 UI。为避免泄露，SiliconFlow 模型凭据只会发送到 `api.siliconflow.cn` 或 `api.siliconflow.com`，不会发送到任意自定义网关。DigitalOcean 页面保存账户 PAT 后只查询账单概要，不请求 billing history，也不会把推理 Key 误当作账单凭据。
 
 ---
 
@@ -229,7 +230,7 @@ dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 | --- | --- |
 | 面板报 `Unexpected end of JSON input` | 插件行缺少 `inject` 列表，路由未注册。按方法 B3 补上 inject 后重启 |
 | 面板一直空白 / 顶部无 tab | 插件未激活。看会话工作区 `dsh-usage-boot.log`；确认 `cordis.patch.yml` 里的行存在且 `name` 正确 |
-| 余额查询提示未配置凭据 | 按提示添加 `DEEPSEEK_API_KEY`、`SILICONFLOW_API_KEY`，或账户级 `DIGITALOCEAN_TOKEN` / `DIGITALOCEAN_ACCESS_TOKEN` |
+| 余额查询提示未配置凭据 | SiliconFlow：添加/编辑名为 `siliconflow` 的模型提供商并保存 API Key。DigitalOcean：在其余额页粘贴账户 PAT，点击「保存并查询」 |
 | SiliconFlow 返回的余额无法识别 | 确认该 Key 可访问 `api.siliconflow.cn/v1/user/info`；插件识别 `totalBalance`、`chargeBalance` 与 `balance` |
 | DigitalOcean 返回 401 / 403 | 使用具有账单读取权限的 DigitalOcean 账户 Personal Access Token，不要使用 DO AI 推理 Key |
 | AMD GPU Cloud 提示暂不支持余额查询 | 这是预期行为：当前没有为推理 Key 公开文档化的余额端点，请在服务商控制台查看 |

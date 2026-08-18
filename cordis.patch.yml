@@ -18,5 +18,6 @@
         - webServer
         - subprocess
         - credentials
+        - settings
         - sandboxPolicy
         - agents
