@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - .github/workflows/publish-npm-v1.11.0.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/npm-publish-v1.11.0.trigger
 
 permissions:
   contents: read
