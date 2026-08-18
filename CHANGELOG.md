@@ -8,6 +8,13 @@
 
 ---
 
+## Unreleased
+
+- **多服务商余额查询**：新增 SiliconFlow `GET /v1/user/info`，展示免费额度、充值额度与总额度。
+- **DigitalOcean 账户余额**：新增账户级 Billing API `GET /v2/customers/my/balance`，读取 `DIGITALOCEAN_TOKEN` / `DIGITALOCEAN_ACCESS_TOKEN`；明确区分账户 PAT 与 DO AI 推理 Key。
+- **AMD GPU Cloud 能力提示**：因推理 Key 暂无公开余额端点，面板显示可操作的“不支持”说明，不再尝试猜测余额 URL。
+- **余额面板**：新增服务商切换、统一金额卡片与按服务商显示的凭据/数据源说明。
+
 ## v1.9.1 (2026-08-16)
 
 - **文档**: README 改为英文优先（`README.md` 英文 + 新增 `README.zh.md` 中文）；补充「npm 包名已更换」醒目通知（旧包名 `@feiyang666/deepseekharnessdesktop` → 新包名 `@feiyang666/dsh-usage-plugin`），并移除发布教程等无关内容；修正 tarball 测试命令为新包名文件名。
@@ -132,4 +139,3 @@
 - CSV / JSON / PNG 长图导出（最新在前，最多 2000 条，超出提示），支持自定义导出目录（原生目录选择器）与「打开所在目录」。
 - JSON / CSV 导入合并，按时间去重。
 - Windows / macOS / Linux 跨平台路径与原生操作适配；启动诊断日志 `dsh-usage-boot.log`。
-
