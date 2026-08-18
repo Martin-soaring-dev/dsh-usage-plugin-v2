@@ -1,0 +1,39 @@
+name: Apply v1.13.0 update
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v1.13.0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply patch
+        run: node scripts/patch-v1.13.0.js
+      - name: Validate syntax and tests
+        run: |
+          node --check lib/index.js
+          node --check lib/client.js
+          npm test
+      - name: Commit generated changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add lib/index.js lib/client.js package.json CHANGELOG.md
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+            exit 0
+          fi
+          git commit -m 'feat: provider-aware pricing and usage UI'
+          git push origin HEAD:main
