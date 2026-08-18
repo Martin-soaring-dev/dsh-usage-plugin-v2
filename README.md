@@ -6,7 +6,7 @@
 
 [GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
 
-**A community plugin for DeepSeek Harness** — records token usage and cost for every model call, with peak/off-peak billing, balance query, a calendar heatmap, and CSV / JSON / PNG export.
+**A community plugin for DeepSeek Harness** — records token usage and cost for every model call, with peak/off-peak billing, multi-provider balance queries, a calendar heatmap, and CSV / JSON / PNG export.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -41,6 +41,17 @@ dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ec
 - **Import**: merge-imports JSON / CSV files, deduplicated by time.
 - **Persistence**: records are written live to `<session workspace>/dsh-usage/usage-records.json` and restored on restart (cap 100000 records).
 - **UI adaptation**: panel typography scales with the app's display-size setting (em-relative fonts); table wrapping and spacing are tuned so large display sizes stay readable.
+
+### Balance provider support
+
+| Provider | Status | Credential | Balance details |
+| --- | --- | --- | --- |
+| DeepSeek | ✅ API query | `DEEPSEEK_API_KEY` | Total, topped-up, and granted balance |
+| SiliconFlow | ✅ API query | `SILICONFLOW_API_KEY` | Total, charged, and free balance |
+| DigitalOcean | ✅ Account Billing API | `DIGITALOCEAN_TOKEN` or `DIGITALOCEAN_ACCESS_TOKEN` | Account balance plus month-to-date usage and balance (USD) |
+| AMD GPU Cloud | ℹ️ Console only | — | No public balance endpoint is currently documented for its inference key |
+
+The AMD entry is intentionally visible in the selector so users get a clear support status instead of a failed request to a guessed endpoint.
 
 ---
 
@@ -115,7 +126,7 @@ This does three things (all automatic):
 
 Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.9.0.tgz`
+> Test a local tarball: `dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.10.0.tgz`
 
 ### 2. Method B: manual install (no pnpm / no `dsh plugin`)
 
@@ -175,16 +186,16 @@ Restart the DeepSeek Harness web app (command line: kill the old process and re-
 
 ### 5. Configuration (for balance query)
 
-The balance panel selects credentials by provider:
+The balance panel selects credentials by provider. Add the applicable credential to the DSH credentials service before querying.
 
-| Provider | Credential | Query source |
+| Provider | Query source | Important note |
 | --- | --- | --- |
-| DeepSeek | `DEEPSEEK_API_KEY` | `GET https://api.deepseek.com/user/balance` |
-| SiliconFlow | `SILICONFLOW_API_KEY` | `GET https://api.siliconflow.cn/v1/user/info` |
-| DigitalOcean | `DIGITALOCEAN_TOKEN` (or `DIGITALOCEAN_ACCESS_TOKEN`) | Account-level `GET /v2/customers/my/balance`; a DO AI inference key is not sufficient |
-| AMD GPU Cloud | — | No documented balance endpoint for its inference key; use the provider console |
+| DeepSeek | `GET https://api.deepseek.com/user/balance` | Uses the same inference key configured for DeepSeek models |
+| SiliconFlow | `GET https://api.siliconflow.cn/v1/user/info` | Uses a SiliconFlow inference key |
+| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | Requires an account-level Personal Access Token; a DO AI inference key is not sufficient |
+| AMD GPU Cloud | Provider console | Selecting it returns an explanatory unsupported status and sends no balance request |
 
-Configure the applicable credential, open the **Balance Query** tab, select the provider, and click **Query Balance**. DigitalOcean requires a separate account-level Personal Access Token with billing read access; the plugin does not reuse or reinterpret an inference key as a billing credential.
+Open the **Balance Query** tab, select the provider, and click **Query Balance**. Requests run on the host side and the credential value is not returned to the browser UI. DigitalOcean requires a separate account-level Personal Access Token with billing read access; the plugin does not reuse or reinterpret an inference key as a billing credential.
 
 ---
 
@@ -218,8 +229,11 @@ For manual installs (Method B), do it in reverse: remove the `usage-plugin` row 
 | --- | --- |
 | Panel reports `Unexpected end of JSON input` | The plugin row is missing the `inject` list, so the route isn't registered. Add the inject list per Method B3 and restart |
 | Panel blank / no top tab | Plugin not activated. Check `dsh-usage-boot.log`; confirm the `cordis.patch.yml` row exists with the correct `name` |
-| Balance query fails with "DEEPSEEK_API_KEY not configured" | Set the API Key in Settings → Models |
-| Balance query network error | Ensure `api.deepseek.com` is reachable (configure a proxy if needed) |
+| Balance query reports a credential is not configured | Add the credential named in the message: `DEEPSEEK_API_KEY`, `SILICONFLOW_API_KEY`, or an account-level `DIGITALOCEAN_TOKEN` / `DIGITALOCEAN_ACCESS_TOKEN` |
+| SiliconFlow balance response cannot be recognized | Confirm the key can access `api.siliconflow.cn/v1/user/info`; the plugin recognizes `totalBalance`, `chargeBalance`, and `balance` |
+| DigitalOcean returns 401 / 403 | Use a DigitalOcean account Personal Access Token with billing read access, not a DO AI inference key |
+| AMD GPU Cloud says balance query is unsupported | This is expected: no public balance endpoint is currently documented for its inference key; view the balance in the provider console |
+| Balance query network error | Ensure the selected provider's API host is reachable (`api.deepseek.com`, `api.siliconflow.cn`, or `api.digitalocean.com`); configure a proxy if needed |
 | `dsh plugin` reports pnpm not found | Install pnpm: `npm install -g pnpm` |
 | Install can't reach the npm registry | Set a mirror: `npm config set registry https://registry.npmmirror.com` (or `pnpm config set registry ...`) and retry |
 | After uninstall, still reports `Cannot find package '@feiyang666/...'` | A package reference remains in the profile. Remove the corresponding row from `cordis.patch.yml` and the package name from `dsh.profile.bundles`, then restart |
