@@ -6,7 +6,7 @@
 
 [GitHub](https://github.com/feiyang-dev/dsh-usage-plugin) · [npm](https://www.npmjs.com/package/@feiyang666/dsh-usage-plugin) · MIT License
 
-**由开发者制作的 DeepSeek Harness 插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、余额查询、日历热力图与 CSV / JSON / PNG 导出。
+**由开发者制作的 DeepSeek Harness 插件** —— 记录每一次模型调用的 token 用量与消耗，支持峰谷计费、多服务商余额查询、日历热力图与 CSV / JSON / PNG 导出。
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-339933)
@@ -41,6 +41,17 @@ dsh-usage-plugin 是 DeepSeek Harness 生态的**用量与消耗统计插件**�
 - **导入**：选择文件（JSON / CSV）合并导入，按时间去重。
 - **持久化**：记录实时落盘到 `<会话工作区>/dsh-usage/usage-records.json`，重启自动恢复（上限 100000 条，尽量多存）。
 - **界面适配**：面板字号跟随应用「显示大小」设置自动缩放（em 相对字号），面板宽度以视口封顶、宽表格在容器内横向滑动（max-content + overflow-x），任何窗口大小下所有列与合计都完整可见，不会裁掉右侧内容。
+
+### 余额服务商支持情况
+
+| 服务商 | 状态 | 凭据 | 展示内容 |
+| --- | --- | --- | --- |
+| DeepSeek | ✅ API 查询 | `DEEPSEEK_API_KEY` | 总余额、充值余额、赠送余额 |
+| SiliconFlow | ✅ API 查询 | `SILICONFLOW_API_KEY` | 总额度、充值额度、免费额度 |
+| DigitalOcean | ✅ 账户级 Billing API | `DIGITALOCEAN_TOKEN` 或 `DIGITALOCEAN_ACCESS_TOKEN` | 账户余额、本月至今用量与余额（USD） |
+| AMD GPU Cloud | ℹ️ 仅控制台查看 | — | 当前没有为推理 Key 公开文档化的余额端点 |
+
+AMD GPU Cloud 会保留在服务商选择器中并明确说明支持状态，避免向猜测的端点发起无效请求。
 
 ---
 
@@ -115,7 +126,7 @@ dsh plugin --profile web add @feiyang666/dsh-usage-plugin
 
 其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
 
-> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.9.0.tgz`
+> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\feiyang666-dsh-usage-plugin-1.10.0.tgz`
 
 ### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
 
@@ -175,16 +186,16 @@ node node_modules/@feiyang666/dsh-usage-plugin/scripts/wire.js
 
 ### 5. 配置（余额查询需要）
 
-余额面板按服务商读取不同凭据：
+余额面板按服务商读取不同凭据。查询前，请将相应凭据添加到 DSH 凭据服务。
 
-| 服务商 | 凭据 | 查询来源 |
+| 服务商 | 查询来源 | 重要说明 |
 | --- | --- | --- |
-| DeepSeek | `DEEPSEEK_API_KEY` | `GET https://api.deepseek.com/user/balance` |
-| SiliconFlow | `SILICONFLOW_API_KEY` | `GET https://api.siliconflow.cn/v1/user/info` |
-| DigitalOcean | `DIGITALOCEAN_TOKEN`（也兼容 `DIGITALOCEAN_ACCESS_TOKEN`） | 账户级 `GET /v2/customers/my/balance`；DO AI 推理 Key 不可用于此查询 |
-| AMD GPU Cloud | — | 推理 Key 暂无公开余额端点，请在服务商控制台查看 |
+| DeepSeek | `GET https://api.deepseek.com/user/balance` | 使用配置 DeepSeek 模型时的同一个推理 Key |
+| SiliconFlow | `GET https://api.siliconflow.cn/v1/user/info` | 使用 SiliconFlow 推理 Key |
+| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | 必须使用账户级 Personal Access Token；DO AI 推理 Key 不可用于此查询 |
+| AMD GPU Cloud | 服务商控制台 | 选择后只返回明确的“暂不支持”说明，不会发送余额请求 |
 
-配置相应凭据后，打开「剩余余额查询」tab、选择服务商并点击「查询余额」。DigitalOcean 需要另行配置具有账单读取权限的账户级 Personal Access Token；插件不会把推理 Key 误当作账单凭据。
+打开「剩余余额查询」tab、选择服务商并点击「查询余额」。请求在 Host 侧执行，凭据值不会返回给浏览器 UI。DigitalOcean 需要另行配置具有账单读取权限的账户级 Personal Access Token；插件不会把推理 Key 误当作账单凭据。
 
 ---
 
@@ -218,8 +229,11 @@ dsh plugin --profile web remove @feiyang666/dsh-usage-plugin
 | --- | --- |
 | 面板报 `Unexpected end of JSON input` | 插件行缺少 `inject` 列表，路由未注册。按方法 B3 补上 inject 后重启 |
 | 面板一直空白 / 顶部无 tab | 插件未激活。看会话工作区 `dsh-usage-boot.log`；确认 `cordis.patch.yml` 里的行存在且 `name` 正确 |
-| 余额查询失败「未配置 DEEPSEEK_API_KEY」 | 在 设置 → 模型 里配置 API Key |
-| 余额查询失败网络错误 | 确认能访问 `api.deepseek.com`（国内网络请配置代理） |
+| 余额查询提示未配置凭据 | 按提示添加 `DEEPSEEK_API_KEY`、`SILICONFLOW_API_KEY`，或账户级 `DIGITALOCEAN_TOKEN` / `DIGITALOCEAN_ACCESS_TOKEN` |
+| SiliconFlow 返回的余额无法识别 | 确认该 Key 可访问 `api.siliconflow.cn/v1/user/info`；插件识别 `totalBalance`、`chargeBalance` 与 `balance` |
+| DigitalOcean 返回 401 / 403 | 使用具有账单读取权限的 DigitalOcean 账户 Personal Access Token，不要使用 DO AI 推理 Key |
+| AMD GPU Cloud 提示暂不支持余额查询 | 这是预期行为：当前没有为推理 Key 公开文档化的余额端点，请在服务商控制台查看 |
+| 余额查询失败网络错误 | 确认所选服务商的 API 域名可访问（`api.deepseek.com`、`api.siliconflow.cn` 或 `api.digitalocean.com`），必要时配置代理 |
 | `dsh plugin` 报 pnpm not found | 安装 pnpm：`npm install -g pnpm` |
 | 安装时连不上 npm 官方源 | 配置镜像：`npm config set registry https://registry.npmmirror.com`（或对 pnpm 设 `pnpm config set registry ...`）后再执行安装命令 |
 | 卸载后仍报 `Cannot find package '@feiyang666/...'` | profile 里残留了包引用。删掉 `cordis.patch.yml` 中对应行与 `dsh.profile.bundles` 里的包名，重启 |
