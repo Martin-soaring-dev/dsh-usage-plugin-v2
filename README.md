@@ -36,7 +36,7 @@ dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ec
 - **Usage Calendar**: a monthly daily-usage heatmap (colored by cost or call count), hover for details including the peak/off-peak cost split, click a day for its call list and peak/off-peak totals, plus a per-day statistics table with peak cost / off-peak cost / total columns and monthly rollups.
 - **Cache Hit List**: newest-first, fully scrollable, with quick filters (Today / 7 days / 30 days / All) and custom date ranges; the summary line and footer total split peak vs off-peak consumption with a grand cost total. The list is paginated (100 rows per page), so it stays smooth even with large data volumes.
 - **Price Table**: the official DeepSeek API price table — base and peak/valley unit prices shown side by side (peak vs off-peak), editable in-panel and persisted to `pricing.json`, with a reset-to-default option.
-- **Balance Query**: queries DeepSeek and SiliconFlow directly with their inference keys, and DigitalOcean through its account-level Billing API. AMD GPU Cloud is shown with an explicit unsupported status because it does not currently publish a balance endpoint for its inference key.
+- **Balance Query**: queries DeepSeek and SiliconFlow directly with their inference keys, and DigitalOcean through its account-level Billing API. SiliconFlow follows a matching custom model provider's `apiKeyEnv` and official `.cn` / `.com` base URL. AMD GPU Cloud is shown as console-only because it does not currently publish a balance endpoint for its inference key.
 - **Export**: CSV / JSON / **PNG long image** (newest-first, up to the latest 2000 records, warns if exceeded; the PNG report includes peak/off-peak cost columns), to any directory (native picker), auto-opens the folder after export.
 - **Import**: merge-imports JSON / CSV files, deduplicated by time.
 - **Persistence**: records are written live to `<session workspace>/dsh-usage/usage-records.json` and restored on restart (cap 100000 records).
@@ -47,9 +47,9 @@ dsh-usage-plugin is a **usage & cost tracker** plugin in the DeepSeek Harness ec
 | Provider | Status | Credential | Balance details |
 | --- | --- | --- | --- |
 | DeepSeek | ✅ API query | `DEEPSEEK_API_KEY` | Total, topped-up, and granted balance |
-| SiliconFlow | ✅ API query | `SILICONFLOW_API_KEY` | Total, charged, and free balance |
-| DigitalOcean | ✅ Account Billing API | `DIGITALOCEAN_TOKEN` or `DIGITALOCEAN_ACCESS_TOKEN` | Account balance plus month-to-date usage and balance (USD) |
-| AMD GPU Cloud | ℹ️ Console only | — | No public balance endpoint is currently documented for its inference key |
+| SiliconFlow | ✅ API query | Matching model provider's `apiKeyEnv`, or `SILICONFLOW_API_KEY` | Total, charged, and free balance |
+| DigitalOcean | ✅ Account Billing API | `DIGITALOCEAN_TOKEN` or `DIGITALOCEAN_ACCESS_TOKEN` ([create token](https://cloud.digitalocean.com/account/api/tokens)) | Account balance plus month-to-date usage and balance (USD) |
+| AMD GPU Cloud | ℹ️ Console only | — | Check credits in [AMD Developer Cloud](https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html); no public inference-key balance endpoint is documented |
 
 The AMD entry is intentionally visible in the selector so users get a clear support status instead of a failed request to a guessed endpoint.
 
@@ -191,11 +191,11 @@ The balance panel selects credentials by provider. Add the applicable credential
 | Provider | Query source | Important note |
 | --- | --- | --- |
 | DeepSeek | `GET https://api.deepseek.com/user/balance` | Uses the same inference key configured for DeepSeek models |
-| SiliconFlow | `GET https://api.siliconflow.cn/v1/user/info` | Uses a SiliconFlow inference key |
-| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | Requires an account-level Personal Access Token; a DO AI inference key is not sufficient |
-| AMD GPU Cloud | Provider console | Selecting it returns an explanatory unsupported status and sends no balance request |
+| SiliconFlow | `GET /v1/user/info` on the matching official `.cn` / `.com` API host | First uses the matching model provider's `apiKeyEnv` and official `baseURL`, then falls back to `SILICONFLOW_API_KEY` |
+| DigitalOcean | `GET https://api.digitalocean.com/v2/customers/my/balance` | Requires an [account-level Personal Access Token](https://cloud.digitalocean.com/account/api/tokens) with `billing:read`; a DO AI inference key is not sufficient |
+| AMD GPU Cloud | [AMD Developer Cloud](https://www.amd.com/en/developer/resources/cloud-access/amd-developer-cloud.html) | Selecting it shows a console-only status and sends no balance request |
 
-Open the **Balance Query** tab, select the provider, and click **Query Balance**. Requests run on the host side and the credential value is not returned to the browser UI. DigitalOcean requires a separate account-level Personal Access Token with billing read access; the plugin does not reuse or reinterpret an inference key as a billing credential.
+Open the **Balance Query** tab, select the provider, and click **Query Balance**. Requests run on the host side and the credential value is not returned to the browser UI. For security, a SiliconFlow model credential is sent only to `api.siliconflow.cn` or `api.siliconflow.com`, never to an arbitrary custom gateway. DigitalOcean requires a separate account-level Personal Access Token with `billing:read`; the plugin does not reuse or reinterpret an inference key as a billing credential.
 
 ---
 

@@ -1,6 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getBalanceProvider, parseBalanceResponse, providerList } from '../lib/balance.js'
+import {
+  getBalanceProvider,
+  matchesModelProvider,
+  parseBalanceResponse,
+  providerList,
+  resolveBalanceEndpoint
+} from '../lib/balance.js'
 
 test('lists every balance provider and defaults to DeepSeek', () => {
   assert.deepEqual(providerList().map((p) => p.id), [
@@ -8,6 +14,8 @@ test('lists every balance provider and defaults to DeepSeek', () => {
   ])
   assert.equal(getBalanceProvider().id, 'deepseek')
   assert.equal(getBalanceProvider('unknown'), null)
+  assert.match(providerList().find((p) => p.id === 'digitalocean').credentialHelpUrl, /digitalocean/)
+  assert.match(providerList().find((p) => p.id === 'amd-gpu-cloud').credentialHelpUrl, /amd\.com/)
 })
 
 test('normalizes DeepSeek balance response', () => {
@@ -24,6 +32,14 @@ test('normalizes DeepSeek balance response', () => {
   assert.deepEqual(res.details.map((d) => d.value), ['10.00', '2.34'])
 })
 
+test('does not report DeepSeek unavailable when the field is omitted', () => {
+  const res = parseBalanceResponse('deepseek', JSON.stringify({
+    balance_infos: [{ currency: 'CNY', total_balance: '1.00' }]
+  }))
+  assert.equal(res.ok, true)
+  assert.equal(res.isAvailable, null)
+})
+
 test('normalizes researched SiliconFlow user info fields', () => {
   const res = parseBalanceResponse('siliconflow', JSON.stringify({
     code: 20000,
@@ -32,7 +48,43 @@ test('normalizes researched SiliconFlow user info fields', () => {
   assert.equal(res.ok, true)
   assert.equal(res.currency, 'CNY')
   assert.equal(res.totalBalance, '12.00')
+  assert.equal(res.zeroBalance, false)
   assert.deepEqual(res.details.map((d) => d.value), ['8.75', '3.25'])
+})
+
+test('marks a successful all-zero SiliconFlow response for UI diagnostics', () => {
+  const res = parseBalanceResponse('siliconflow', JSON.stringify({
+    code: 20000,
+    data: { balance: '0', chargeBalance: '0', totalBalance: '0' }
+  }))
+  assert.equal(res.ok, true)
+  assert.equal(res.zeroBalance, true)
+})
+
+test('matches custom model provider routes without confusing unrelated providers', () => {
+  assert.equal(matchesModelProvider('siliconflow', 'siliconflow', ''), true)
+  assert.equal(matchesModelProvider('siliconflow', 'custom-route', 'SiliconFlow'), true)
+  assert.equal(matchesModelProvider('digitalocean', 'digital-ocean', ''), true)
+  assert.equal(matchesModelProvider('siliconflow', 'digital-ocean', ''), false)
+})
+
+test('uses only official SiliconFlow hosts for balance requests', () => {
+  assert.equal(
+    resolveBalanceEndpoint('siliconflow', 'https://api.siliconflow.com/v1'),
+    'https://api.siliconflow.com/v1/user/info'
+  )
+  assert.equal(
+    resolveBalanceEndpoint('siliconflow', 'https://api.siliconflow.cn/v1/chat/completions'),
+    'https://api.siliconflow.cn/v1/user/info'
+  )
+  assert.equal(
+    resolveBalanceEndpoint('siliconflow', 'https://example.com/v1'),
+    'https://api.siliconflow.cn/v1/user/info'
+  )
+  assert.equal(
+    resolveBalanceEndpoint('siliconflow', 'http://api.siliconflow.com/v1'),
+    'https://api.siliconflow.cn/v1/user/info'
+  )
 })
 
 test('normalizes DigitalOcean account billing balance', () => {
