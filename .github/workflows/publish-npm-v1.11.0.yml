@@ -1,0 +1,63 @@
+name: Publish npm v1.11.0
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/publish-npm-v1.11.0.yml
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the released tag
+        uses: actions/checkout@v4
+        with:
+          ref: v1.11.0
+          fetch-depth: 0
+
+      - name: Set up Node.js and npm registry
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify package contract
+        run: node scripts/check-package.js
+
+      - name: Run tests
+        run: node --test
+
+      - name: Verify exact package identity
+        run: |
+          node -e "const p=require('./package.json'); if(p.name!=='@feiyang666/dsh-usage-plugin'||p.version!=='1.11.0') { throw new Error('unexpected package identity: '+p.name+'@'+p.version) }"
+
+      - name: Verify npm authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::Repository secret NPM_TOKEN is not configured."
+            exit 1
+          fi
+          npm whoami --registry=https://registry.npmjs.org
+
+      - name: Publish npm package if needed
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if npm view @feiyang666/dsh-usage-plugin@1.11.0 version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "@feiyang666/dsh-usage-plugin@1.11.0 is already published; skipping."
+          else
+            npm publish --access public --registry=https://registry.npmjs.org
+          fi
+
+      - name: Verify published version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test "$(npm view @feiyang666/dsh-usage-plugin@1.11.0 version --registry=https://registry.npmjs.org)" = "1.11.0"
