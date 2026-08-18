@@ -1,0 +1,71 @@
+name: Publish fork to npm
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/npm-publish-request.json
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-dsh-usage-plugin-v2
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js and npm
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Verify package contract
+        run: node scripts/check-package.js
+
+      - name: Run tests
+        run: node --test
+
+      - name: Verify independent package identity
+        run: |
+          node -e "const p=require('./package.json'); if(p.name!=='dsh-usage-plugin-v2'||p.version!=='1.11.0') throw new Error('unexpected package identity: '+p.name+'@'+p.version)"
+
+      - name: Authenticate, publish, and verify
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::Repository secret NPM_TOKEN is not configured."
+            exit 1
+          fi
+
+          npm whoami --registry=https://registry.npmjs.org
+
+          if npm view dsh-usage-plugin-v2@1.11.0 version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "dsh-usage-plugin-v2@1.11.0 is already published; skipping upload."
+          else
+            npm publish --access public --provenance --registry=https://registry.npmjs.org
+          fi
+
+          for attempt in 1 2 3 4 5 6; do
+            published="$(npm view dsh-usage-plugin-v2@1.11.0 version --registry=https://registry.npmjs.org 2>/dev/null || true)"
+            if [ "$published" = "1.11.0" ]; then
+              echo "Verified dsh-usage-plugin-v2@1.11.0 on npm."
+              exit 0
+            fi
+            sleep 10
+          done
+
+          echo "::error::npm did not return dsh-usage-plugin-v2@1.11.0 after publication."
+          exit 1
