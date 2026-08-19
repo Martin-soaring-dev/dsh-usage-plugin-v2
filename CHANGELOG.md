@@ -10,6 +10,14 @@
 
 ## Unreleased
 
+## v1.13.3 (2026-08-20)
+
+- **更新器运行时修复**：自动更新执行 pnpm 时优先使用当前 DSH/Harness 进程所在的 Node 运行时目录，避免系统默认旧版 Node 导致 pnpm 启动失败。
+- **供应链策略兼容**：仅对明确指定的 GitHub Release 更新命令临时设置 minimumReleaseAge=0，避免 profile 中无关的新依赖阻断插件升级；不会修改用户的全局 pnpm 配置。
+- **更新失败诊断增强**：错误信息现在包含 exitCode、profile、Node、pnpm、stderr 与 stdout，后续排错不再只显示笼统的“安装 GitHub Release 失败”。
+- **汇率显示统一**：价格页汇率区域使用货币符号（$ / ¥）替代 USD / CNY 字母代码，显示更紧凑。
+
+
 ## v1.13.2 (2026-08-20)
 
 - **SiliconFlow 余额页重排**：账户总余额下方直接显示充值余额、赠送/旧版免费余额与查询时间，先呈现用户最关心的余额信息。
