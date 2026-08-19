@@ -1,0 +1,38 @@
+name: Apply v1.13.2 balance layout
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-v1.13.2-balance-layout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Apply patch
+        run: node scripts/apply-v1.13.2-balance-layout.js
+      - name: Validate
+        run: |
+          node --check lib/client.js
+          npm test
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add lib/client.js package.json CHANGELOG.md
+          if git diff --cached --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git commit -m 'ui: reorder SiliconFlow balance details'
+          git push origin HEAD:main
