@@ -37,3 +37,5 @@ jobs:
           fi
           git commit -m 'feat: add FX-aware provider pricing'
           git push origin HEAD:main
+
+# trigger
