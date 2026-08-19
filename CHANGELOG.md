@@ -12,6 +12,11 @@
 
 ## v1.13.0 (2026-08-19)
 
+- **USD/CNY 汇率换算**：价格页显示 Frankfurter 最新可用 USD/CNY 与反向汇率；DigitalOcean 美元价格自动乘汇率统一折算成人民币。
+- **汇率留痕**：新调用记录当时缓存的 USD/CNY 汇率与汇率日期；旧记录没有历史汇率时使用当前最新可用汇率估算。
+- **服务商计价边界**：DeepSeek 官方价只用于 deepseek-official/deepseek，避免其他 provider 因模型名包含 flash/pro 而误套官方价。
+- **暂不计费/免费**：Alibaba/千问暂不计费；AMD GPU Cloud DeepSeek V4 Flash 按免费 ¥0。
+
 - **按模型表增加 API 服务商列**：同一模型跨多个服务商时合并显示实际 provider。
 - **SiliconFlow 独立计价**：已核验模型按 SiliconFlow 官方公开价格计算。
 - **第三方价格覆盖表**：新增 SiliconFlow、DigitalOcean、阿里云 Model Studio（千问）与 AMD GPU Cloud 的价格/覆盖状态。
