@@ -86,3 +86,4 @@ if (!changelog.includes('## v1.13.2 (2026-08-20)')) changelog = changelog.replac
 fs.writeFileSync('CHANGELOG.md', changelog)
 
 console.log('v1.13.2 balance layout patch applied')
+// workflow trigger: v1.13.2
