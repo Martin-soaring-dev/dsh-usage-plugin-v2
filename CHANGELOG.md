@@ -10,6 +10,14 @@
 
 ## Unreleased
 
+## v1.13.1 (2026-08-19)
+
+- **修复更新装错目录**：开发态插件位于 workspace 的 `.dsh/plugins/...` 时，不再把 workspace `.dsh` 误判为运行中的 DSH profile；改为扫描 `~/.dsh/profiles/*/package.json`，按 `link:/file:` 依赖精确反查真正的 profile。
+- **开发链接迁移到 Release**：在真正的 profile 目录执行 `pnpm add <GitHub Release tarball> --save-exact`，使正式运行依赖从 `link:` 切换为固定 Release tarball。
+- **安装后验证**：只有当运行 profile 的依赖不再是 `link:/file:`、且 `node_modules/dsh-usage-plugin-v2/package.json` 的版本与目标 Release 完全一致时才报告成功，杜绝“命令成功但 DSH 仍加载旧版本”的假成功。
+- **拒绝猜测 profile**：无法唯一确认运行 profile 时停止自动更新并给出错误，而不是修改无关 workspace。
+
+
 ## v1.13.0 (2026-08-19)
 
 - **USD/CNY 汇率换算**：价格页显示 Frankfurter 最新可用 USD/CNY 与反向汇率；DigitalOcean 美元价格自动乘汇率统一折算成人民币。
