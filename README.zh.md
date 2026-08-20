@@ -144,21 +144,41 @@ dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-pl
 
 ### 推荐安装方式
 
-首次安装使用 GitHub Release 命令：
+下面这套流程已经通过标准 DeepSeek Harness CLI 验证，**不需要切换目录，也不需要知道 DSH 安装在本机哪个路径**。
+
+1. 全局安装官方 DSH CLI（如果 `dsh --version` 已经能运行，可以跳过）：
 
 ```bash
-# 前提：已安装 dsh（npm install -g @deepseek-ai/dsh）
+npm install -g @deepseek-ai/dsh
+```
+
+2. 验证 DSH CLI：
+
+```bash
+dsh --version
+```
+
+如果刚安装完成后终端仍提示无法识别 `dsh`，关闭当前终端并重新打开一个，再执行上述命令。
+
+3. 直接从稳定 GitHub Release 安装本插件到默认 Web profile：
+
+```bash
 dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
-也可对其它 profile 安装：
+4. 重启 DeepSeek Harness：
 
 ```bash
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
-dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
+dsh web
 ```
 
-装完重启 dsh web 服务即可。详细的手动安装 / 接线 / 卸载 / 排障说明见下方。
+如果默认 Web 端口已经被其它进程占用，可以指定其它端口，例如：
+
+```bash
+dsh web --port 3070
+```
+
+整个安装过程**不需要 `cd`、不需要填写任何本地安装路径、不需要手改 YAML，也不需要复制插件文件**。如需安装到其它 profile，只需把 `web` 换成目标 profile 名。详细的手动安装 / 接线 / 卸载 / 排障说明见下方。
 
 ---
 

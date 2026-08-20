@@ -144,21 +144,41 @@ After a marketplace installs the package, later upgrades can continue through **
 
 ### Recommended Installation
 
-Use the GitHub Release command for the first installation:
+The following flow has been verified with the standard DeepSeek Harness CLI and does **not** require changing directories or knowing where DSH is installed.
+
+1. Install the official DSH CLI globally (skip this step if `dsh --version` already works):
 
 ```bash
-# Prerequisite: install dsh (npm install -g @deepseek-ai/dsh)
+npm install -g @deepseek-ai/dsh
+```
+
+2. Verify the CLI:
+
+```bash
+dsh --version
+```
+
+If your shell still says that `dsh` is not recognized immediately after installation, close that terminal and open a new one, then retry.
+
+3. Install this plugin into the default Web profile directly from the stable GitHub Release:
+
+```bash
 dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
-Or install to another profile:
+4. Restart DeepSeek Harness:
 
 ```bash
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
-dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
+dsh web
 ```
 
-Restart the dsh web service after installation. Detailed manual install / wiring / uninstall / troubleshooting follows below.
+If the default Web port is already occupied, start DSH on another port, for example:
+
+```bash
+dsh web --port 3070
+```
+
+No `cd`, local installation path, YAML editing, or manual file copying is required. For another profile, replace `web` with the desired profile name. Detailed manual install / wiring / uninstall / troubleshooting follows below.
 
 ---
 
