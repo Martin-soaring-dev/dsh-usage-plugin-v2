@@ -54,6 +54,26 @@ DigitalOcean 账单使用 USD，而部分其它服务商使用 CNY。本 Fork �
 
 本 Fork 通过 GitHub Releases 维护，不发布自己的 npm 包。插件内提供手动更新检查，可比较当前安装版本与最新 GitHub Release，并将新版本安装到当前 DSH profile。
 
+## 界面预览
+
+### GitHub Release 插件更新
+
+插件可以在 DSH 设置中检查本仓库的最新 GitHub Release，并安装到当前 profile。
+
+![插件更新页面](./docs/assets/plugin-update.webp)
+
+### 多服务商价格与 USD/CNY 汇率
+
+价格表会展示当前 USD/CNY 汇率、DeepSeek 官方价格，以及 SiliconFlow、DigitalOcean、Alibaba / 千问和 AMD GPU Cloud 的第三方服务商定价与覆盖状态。
+
+![价格表、汇率与第三方服务商覆盖](./docs/assets/pricing-current.jpg)
+
+### 多服务商余额查询
+
+余额页分别展示 DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 的实际支持方式，而不是假定所有服务商都共享同一种余额接口。
+
+![DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 余额页面](./docs/assets/balance-providers-current.jpg)
+
 ### 本 Fork 的安装方式
 
 使用标准 DeepSeek Harness CLI 时，不需要填写本地路径，也不需要 `cd`：
