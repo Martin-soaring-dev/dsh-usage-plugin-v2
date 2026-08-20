@@ -82,7 +82,7 @@
 >
 > 本仓库是独立 fork，不发布 npm 包，也不会占用或冒用上游 `@feiyang666` scope。安装包与更新均来自本仓库的正式 GitHub Release。
 >
-> - 安装本 fork：`dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"`
+> - 安装本 fork：`dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"`
 > - 更新本 fork：打开 Harness 设置中的“插件更新”，点击“检查更新”；发现新版本后点击安装并完全重启服务。
 > - 不要在同一个 DSH profile 中同时安装本 fork 与上游用量插件；两者提供相同功能入口，可能竞争相同的路由和面板。
 > - 如需迁移，请先从该 profile 移除上游包，再安装本 fork。
@@ -126,20 +126,36 @@ AMD GPU Cloud 会保留在服务商选择器中并明确说明支持状态，避
 #### 剩余余额查询
 ![剩余余额查询](./docs/assets/balance-query.png)
 
+### DSH 插件市场准备
+
+本仓库已经按标准 DSH Bundle 插件的形式整理：`package.json` 声明 Bundle patch，仓库包含 `cordis.patch.yml`，同时暴露 Web Client 入口，并补充了适合插件市场检索的元数据与关键词。
+
+首次安装仍以本仓库的稳定 GitHub Release tarball 为唯一正式包源：
+
+```bash
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
+```
+
+如果某个 DSH 插件市场完成首次安装，后续版本仍可继续通过 **设置 → 插件更新** 从本仓库 GitHub Releases 更新，不要求本项目发布 npm 包。
+
+> 不同插件市场的收录/索引规则可能不同。为提高可发现性，建议在 GitHub 仓库页面手动添加 `dsh-plugin` Topic，并可附加 `deepseek-harness`、`usage-tracker`、`cost-tracker` 等 Topic。
+
+---
+
 ### 推荐安装方式
 
 首次安装使用 GitHub Release 命令：
 
 ```bash
 # 前提：已安装 dsh（npm install -g @deepseek-ai/dsh）
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 也可对其它 profile 安装：
 
 ```bash
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
-dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
+dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 装完重启 dsh web 服务即可。详细的手动安装 / 接线 / 卸载 / 排障说明见下方。
@@ -172,7 +188,7 @@ dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usa
 #### 1. 方法 A（推荐）：一条命令安装
 
 ```bash
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 这条命令会做三件事（全部自动）：
@@ -183,7 +199,7 @@ dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-pl
 
 其它 profile 同理，把 `web` 换成你的 profile 名即可（如 `dsh plugin --profile headless add ...`；`dsh web` 等价于 `dsh --profile web`）。
 
-> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.12.0.tgz`
+> 想用本地 tarball 测试：`dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.13.5.tgz`
 
 #### 2. 方法 B：手动安装（不使用 pnpm / 无 `dsh plugin`）
 
@@ -193,7 +209,7 @@ dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-pl
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 # 然后手动把插件行加进 web/cordis.patch.yml（见 B3），再重启
 ```
 
@@ -203,7 +219,7 @@ pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs
 cd ~/.dsh/profiles/web
 # 若该目录还没有 package.json（用 dsh plugin 初始化过才会有）：
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+npm install "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 **B3. 接线（只需做一次，幂等）：** 在 `~/.dsh/profiles/web/cordis.patch.yml` 末尾追加：

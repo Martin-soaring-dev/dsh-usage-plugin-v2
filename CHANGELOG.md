@@ -10,6 +10,14 @@
 
 ## Unreleased
 
+## v1.13.5 (2026-08-20)
+
+- **插件市场准备**：补充 `dsh-plugin`、`deepseek-harness`、usage/cost tracker 等 package keywords，增强市场与仓库搜索可发现性。
+- **安装文档更新**：中英文 README 新增 DSH 插件市场准备说明，明确标准 Bundle 契约与 GitHub Release 首次安装路径。
+- **安装链接刷新**：README 中历史固定的 v1.12.0 示例统一更新为 v1.13.5，避免新用户复制旧版本安装命令。
+- **发行策略保持不变**：仍不发布 npm 包；首次安装使用 GitHub Release，后续可通过插件内 GitHub Release updater 更新。
+
+
 ## v1.13.4 (2026-08-20)
 
 - **DigitalOcean 余额页重排**：将“DigitalOcean Account API”凭据说明与 Token 管理区从余额结果上方移动到余额明细卡片之后。

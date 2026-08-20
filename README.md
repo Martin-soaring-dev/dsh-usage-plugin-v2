@@ -82,7 +82,7 @@ When no public endpoint exists, the plugin states the limitation and points user
 >
 > This repository is an independent fork. It does not publish an npm package or use the upstream `@feiyang666` scope. Installations and updates come only from this repository's stable GitHub Releases.
 >
-> - Install this fork with: `dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"`
+> - Install this fork with: `dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"`
 > - Update it from Harness Settings → Plugin Update → Check for Updates, then restart the service completely.
 > - Do not install this fork and the upstream usage plugin into the same DSH profile; both provide the same feature surface and may compete for the same routes and panels.
 > - To migrate, remove the upstream package from that profile first, then install this fork.
@@ -126,20 +126,36 @@ The AMD entry is intentionally visible in the selector so users get a clear supp
 #### Balance Query
 ![Balance Query](./docs/assets/balance-query.png)
 
+### DSH Plugin Marketplace Readiness
+
+This repository is prepared to be discoverable and installable as a standard DSH bundle plugin. It declares the DSH bundle patch in `package.json`, ships `cordis.patch.yml`, exposes the browser client entry, and includes marketplace-oriented metadata/keywords.
+
+For first installation, the canonical package source remains the stable GitHub Release tarball:
+
+```bash
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
+```
+
+After a marketplace installs the package, later upgrades can continue through **Settings → Plugin Update** using this repository's GitHub Releases. No npm publication is required by this project.
+
+> Marketplace operators may use different discovery/indexing rules. To improve discoverability, add the GitHub repository topic `dsh-plugin` (plus optional topics such as `deepseek-harness`, `usage-tracker`, and `cost-tracker`) on the repository page.
+
+---
+
 ### Recommended Installation
 
 Use the GitHub Release command for the first installation:
 
 ```bash
 # Prerequisite: install dsh (npm install -g @deepseek-ai/dsh)
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 Or install to another profile:
 
 ```bash
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
-dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
+dsh plugin --profile headless add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 Restart the dsh web service after installation. Detailed manual install / wiring / uninstall / troubleshooting follows below.
@@ -172,7 +188,7 @@ So for users, **installation is one command** — no YAML editing, no manual fil
 #### 1. Method A (recommended): one command
 
 ```bash
-dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 This does three things (all automatic):
@@ -183,7 +199,7 @@ This does three things (all automatic):
 
 Same for other profiles (replace `web` with your profile name, e.g. `dsh plugin --profile headless add ...`; `dsh web` equals `dsh --profile web`).
 
-> Test a local tarball: `dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.12.0.tgz`
+> Test a local tarball: `dsh plugin --profile web add C:\path\to\dsh-usage-plugin-v2-1.13.5.tgz`
 
 #### 2. Method B: manual install (no pnpm / no `dsh plugin`)
 
@@ -193,7 +209,7 @@ Only for when you have no pnpm or want full manual control. **Do not `npm instal
 
 ```bash
 cd ~/.dsh/profiles/web
-pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 # then manually append the plugin row to web/cordis.patch.yml (see B3) and restart
 ```
 
@@ -203,7 +219,7 @@ pnpm add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs
 cd ~/.dsh/profiles/web
 # if no package.json exists there yet (only after `dsh plugin` init):
 # echo '{"name":"dsh-profile-web","private":true,"dependencies":{}}' > package.json
-npm install "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.12.0.tar.gz"
+npm install "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
 ```
 
 **B3. Wire it up (once, idempotent):** append to `~/.dsh/profiles/web/cordis.patch.yml`:
