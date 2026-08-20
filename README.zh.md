@@ -60,27 +60,31 @@ DigitalOcean 账单使用 USD，而部分其它服务商使用 CNY。本 Fork �
 
 插件可以在 DSH 设置中检查本仓库的最新 GitHub Release，并安装到当前 profile。
 
-![插件更新页面](./docs/assets/plugin-update.webp)
+![插件更新页面](./docs/assets/plugin-update.png)
 
 ### 多服务商价格与 USD/CNY 汇率
 
 价格表会展示当前 USD/CNY 汇率、DeepSeek 官方价格，以及 SiliconFlow、DigitalOcean、Alibaba / 千问和 AMD GPU Cloud 的第三方服务商定价与覆盖状态。
 
-![价格表、汇率与第三方服务商覆盖](./docs/assets/pricing-current.jpg)
+![价格表、汇率与第三方服务商覆盖](./docs/assets/pricing-current1.png)
+
+![价格表、汇率与第三方服务商覆盖](./docs/assets/pricing-current2.png)
 
 ### 多服务商余额查询
 
 余额页分别展示 DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 的实际支持方式，而不是假定所有服务商都共享同一种余额接口。
 
-![DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 余额页面](./docs/assets/balance-providers-current.jpg)
+![DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 余额页面](./docs/assets/balance-providers-current1.png)
+
+![DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 余额页面](./docs/assets/balance-providers-current2.png)
+
+![DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 余额页面](./docs/assets/balance-providers-current3.png)
+
+![DeepSeek、SiliconFlow、DigitalOcean 与 AMD GPU Cloud 余额页面](./docs/assets/balance-providers-current4.png)
 
 ### 本 Fork 的安装方式
 
-使用标准 DeepSeek Harness CLI 时，不需要填写本地路径，也不需要 `cd`：
-
-```bash
-npm install -g @deepseek-ai/dsh
-```
+使用标准 DeepSeek Harness 安装后，可通过以下命令安装插件：
 
 ```bash
 dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
