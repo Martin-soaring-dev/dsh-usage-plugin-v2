@@ -60,27 +60,31 @@ This fork is maintained through GitHub Releases rather than publishing its own n
 
 The plugin can check the latest GitHub Release from DSH settings and install it into the active profile.
 
-![Plugin update panel](./docs/assets/plugin-update.webp)
+![Plugin update panel](./docs/assets/plugin-update.png)
 
 ### Provider-aware pricing and USD/CNY exchange rate
 
 The price table now includes the current USD/CNY exchange rate, official DeepSeek pricing, and provider-specific pricing/coverage information for SiliconFlow, DigitalOcean, Alibaba/Qwen and AMD GPU Cloud.
 
-![Pricing, exchange rate and provider coverage](./docs/assets/pricing-current.jpg)
+![Pricing, exchange rate and provider coverage](./docs/assets/pricing-current1.png)
+
+![Pricing, exchange rate and provider coverage](./docs/assets/pricing-current2.png)
 
 ### Multi-provider balance query
 
 The balance panel exposes provider-specific behavior for DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud rather than pretending all providers share one balance API.
 
-![DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud balance views](./docs/assets/balance-providers-current.jpg)
+![DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud balance views](./docs/assets/balance-providers-current1.png)
+
+![DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud balance views](./docs/assets/balance-providers-current2.png)
+
+![DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud balance views](./docs/assets/balance-providers-current3.png)
+
+![DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud balance views](./docs/assets/balance-providers-current4.png)
 
 ### Installation for this fork
 
-With the standard DeepSeek Harness CLI installed, no local path or `cd` is required:
-
-```bash
-npm install -g @deepseek-ai/dsh
-```
+With the standard DeepSeek Harness installed, plugin could be installed using:
 
 ```bash
 dsh plugin --profile web add "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/archive/refs/tags/v1.13.5.tar.gz"
