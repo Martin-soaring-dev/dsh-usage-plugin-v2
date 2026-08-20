@@ -32,3 +32,5 @@ jobs:
           fi
           git commit -m 'docs: add verified plugin installation guide'
           git push origin HEAD:main
+
+# trigger: verified installation flow
