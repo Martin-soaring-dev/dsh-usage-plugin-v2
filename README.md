@@ -54,6 +54,26 @@ Provider credentials are handled according to their actual purpose:
 
 This fork is maintained through GitHub Releases rather than publishing its own npm package. The plugin includes a manual update checker that compares the installed version with the latest release and can install a newer release into the active DSH profile.
 
+## Screenshots
+
+### GitHub Release updater
+
+The plugin can check the latest GitHub Release from DSH settings and install it into the active profile.
+
+![Plugin update panel](./docs/assets/plugin-update.webp)
+
+### Provider-aware pricing and USD/CNY exchange rate
+
+The price table now includes the current USD/CNY exchange rate, official DeepSeek pricing, and provider-specific pricing/coverage information for SiliconFlow, DigitalOcean, Alibaba/Qwen and AMD GPU Cloud.
+
+![Pricing, exchange rate and provider coverage](./docs/assets/pricing-current.jpg)
+
+### Multi-provider balance query
+
+The balance panel exposes provider-specific behavior for DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud rather than pretending all providers share one balance API.
+
+![DeepSeek, SiliconFlow, DigitalOcean and AMD GPU Cloud balance views](./docs/assets/balance-providers-current.jpg)
+
 ### Installation for this fork
 
 With the standard DeepSeek Harness CLI installed, no local path or `cd` is required:
