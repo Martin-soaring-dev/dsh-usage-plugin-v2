@@ -36,3 +36,5 @@ jobs:
           fi
           git commit -m 'ui: move DigitalOcean account API below billing details'
           git push origin HEAD:main
+
+# trigger: v1.13.4
