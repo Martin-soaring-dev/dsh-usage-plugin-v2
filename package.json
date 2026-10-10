@@ -1,0 +1,80 @@
+{
+  "name": "dsh-usage-plugin-v2",
+  "version": "1.13.5",
+  "description": "Independent v2 fork of the DeepSeek Harness usage & cost tracker plugin, distributed and updated through GitHub Releases.",
+  "keywords": [
+    "deepseek",
+    "harness",
+    "dsh",
+    "plugin",
+    "usage",
+    "cost",
+    "tokens",
+    "cache",
+    "balance",
+    "deepseek-harness",
+    "dsh-plugin",
+    "usage-tracker",
+    "token-usage",
+    "cost-tracker",
+    "siliconflow",
+    "digitalocean"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2.git"
+  },
+  "author": "Martin-soaring-dev",
+  "contributors": [
+    {
+      "name": "feiyang-dev (original project)",
+      "url": "https://github.com/feiyang-dev/dsh-usage-plugin"
+    },
+    {
+      "name": "liu3734",
+      "url": "https://github.com/liu3734"
+    }
+  ],
+  "homepage": "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2#readme",
+  "bugs": {
+    "url": "https://github.com/Martin-soaring-dev/dsh-usage-plugin-v2/issues"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "files": [
+    "lib",
+    "scripts",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "wire": "node scripts/wire.js",
+    "check": "node scripts/check-package.js && node --test",
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  }
+}
